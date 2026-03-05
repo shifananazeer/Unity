@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import api from "../services/api";
 import { loginUser } from "../services/authService";
+import Swal from "sweetalert2";
 
-const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  onClose: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
     const [formData, setFormData] = useState({
         mobileNumber: "",
         password: ""
@@ -12,19 +17,49 @@ const LoginForm: React.FC = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async(e: React.FormEvent) => {
-        e.preventDefault();
-        console.log(formData);
-    try {
-      const data = await loginUser(formData.mobileNumber, formData.password);
-      localStorage.setItem("token", data.token);
-      console.log("Login successful:", data);
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      console.log(error.response.data);
-    }
-    };  
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log(formData);
 
+  try {
+    const data = await loginUser(formData.mobileNumber, formData.password);
+
+    // Save token
+    localStorage.setItem("token", data.token);
+
+    // Dispatch event so Navbar/Hero rerender
+    window.dispatchEvent(new Event("authChange"));
+
+    // Close modal
+    onClose();
+
+    // Success toast
+    Swal.fire({
+      icon: "success",
+      title: "Login Successful",
+      showConfirmButton: false,
+      timer: 1500,
+      position: "top-end",
+      toast: true,
+    });
+
+    console.log("Login successful:", data);
+
+  } catch (error: any) {
+    console.error("Login failed:", error);
+
+    // Error toast
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: error?.response?.data?.message || "Something went wrong",
+      showConfirmButton: false,
+      timer: 2000,
+      position: "top-end",
+      toast: true,
+    });
+  }
+};
   return (
     <form className="space-y-4"
       onSubmit={handleSubmit}>

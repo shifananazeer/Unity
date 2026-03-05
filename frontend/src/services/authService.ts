@@ -12,3 +12,5 @@ export const signupUser = async (fullName: string, mobileNumber: string, pinCode
     console.log("Signup successful:", res.data);
     return res.data;
 };
+
+

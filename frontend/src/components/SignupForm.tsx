@@ -1,8 +1,13 @@
 import React from "react";
 import api from "../services/api";
 import { signupUser } from "../services/authService";
+import Swal from "sweetalert2";
 
-const SignupForm: React.FC = () => {
+interface SignupFormProps {
+  onClose: () => void;
+}
+
+const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
   const [formData, setFormData] = React.useState({
     fullName: "",
     mobileNumber: "",
@@ -32,7 +37,25 @@ const SignupForm: React.FC = () => {
         formData.password
       );
       localStorage.setItem("token", res.token);
+
+       // Dispatch event so Navbar/Hero rerender
+     window.dispatchEvent(new Event("authChange"));
+    
+      // Close modal
+         onClose();
+     
+         // Success toast
+         Swal.fire({
+           icon: "success",
+           title: "Registration Successful",
+           showConfirmButton: false,
+           timer: 1500,
+           position: "top-end",
+           toast: true,
+         });
+         
       console.log("Signup successful:", res.data);
+
     } catch (error: any) {
       console.error("Signup failed:", error);
       console.log(error.response.data);

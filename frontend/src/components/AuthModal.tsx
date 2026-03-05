@@ -61,7 +61,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ type, onClose }) => {
           </button>
         </div>
 
-        {isLogin ? <LoginForm /> : <SignupForm />}
+        {isLogin ? <LoginForm onClose={onClose} /> : <SignupForm onClose={onClose} />}
       </div>
     </div>
   );
