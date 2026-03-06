@@ -1,5 +1,7 @@
 import express from "express";
 import authRoutes from "./routes/user/authRoutes";
+import paymentRoutes from "./routes/user/paymentRoutes";
+import userRoutes from "./routes/user/userRoutes";
 import cors from "cors";
 
 const app = express();  
@@ -13,7 +15,12 @@ app.get("/", (req, res) => {
   res.send("Backend is running successfully 🚀");
 });
 
-// Routes
+// auth Routes
 app.use("/api/auth", authRoutes);
+
+// payment routes
+app.use("/api/payment", paymentRoutes);
+
+app.use("/api/user" , userRoutes)
 
 export default app;

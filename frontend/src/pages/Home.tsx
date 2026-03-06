@@ -1,6 +1,4 @@
-import { Link } from "react-router-dom";
-import Hero from "../components/Hero";
-import LoginForm from "../components/LoginForm";
+import Hero from "../components/user/Hero";
 
 function Home() {
   return (
@@ -8,7 +6,7 @@ function Home() {
      
 <Hero />
     
-<LoginForm />
+
 </div>
   );
 }

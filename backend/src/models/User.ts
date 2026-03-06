@@ -9,6 +9,7 @@ export interface IUser extends Document {
   state: string;
   localBody: string; // Panchayath / Corporation
   password: string;
+  profilePic?: string;
 }
 
 
@@ -19,7 +20,8 @@ const UserSchema: Schema = new Schema({
   district: { type: String, required: true },
   state: { type: String, required: true },
   localBody: { type: String, required: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  profilePic: { type: String },
 }, { timestamps: true });
 
 
