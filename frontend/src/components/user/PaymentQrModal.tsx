@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 interface PaymentQrModalProps {
   visible: boolean;
   onClose: () => void;
-  amount?: number; 
-  qrImage?: string; 
+  amount?: number;
+  qrImage?: string;
 }
 
 const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
@@ -14,11 +15,45 @@ const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
   qrImage = "/qr-code.png",
 }) => {
   const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setScreenshot(e.target.files[0]);
-      console.log("Uploaded screenshot:", e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!screenshot) {
+      alert("Please upload screenshot");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append("screenshot", screenshot);
+
+      const token = localStorage.getItem("token");
+
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/payment/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Payment proof submitted successfully");
+      onClose();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to upload screenshot");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,33 +68,47 @@ const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
         >
           ✕
         </button>
+
         <h2 className="text-xl font-semibold mb-4">Scan to Pay ₹{amount}</h2>
 
         <img
           src={qrImage}
-          alt={`Static QR Code for ₹${amount}`}
+          alt={`QR Code for ₹${amount}`}
           className="mx-auto w-64 h-64"
         />
+
         <p className="mt-2 text-gray-700 mb-4">
           Use GPay, PhonePe, Paytm, or any UPI app to scan.
         </p>
 
         <div>
           <label className="block mb-2 font-medium text-gray-700">
-            Upload Screenshot (optional)
+            Upload Screenshot
           </label>
+
           <input
             type="file"
             accept="image/*"
             onChange={handleScreenshotUpload}
             className="border rounded px-3 py-2 w-full"
           />
+
           {screenshot && (
             <p className="mt-2 text-green-600 text-sm">
               Uploaded: {screenshot.name}
             </p>
           )}
         </div>
+
+        {/* Submit Button */}
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="mt-4 w-full bg-black text-white py-2 rounded hover:bg-gray-800"
+        >
+          {loading ? "Submitting..." : "Submit Payment Proof"}
+        </button>
       </div>
     </div>
   );

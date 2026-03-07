@@ -5,8 +5,6 @@ import connectDB from "./config/db";
 import path from "path";
 import express from "express";
 
-
-
 // Connect Database
 connectDB();
 

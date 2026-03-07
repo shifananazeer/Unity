@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getUserPayments } from "../../services/profileService";
+import { getUserPayments } from "../../services/user/profileService";
 
 interface Payment {
   _id: string;

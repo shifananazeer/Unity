@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { updateProfile, uploadProfilePic } from "../../services/profileService";
+import { updateProfile, uploadProfilePic } from "../../services/user/profileService";
 
 interface Props {
   profile: any;

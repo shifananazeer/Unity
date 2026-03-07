@@ -10,6 +10,7 @@ export interface IUser extends Document {
   localBody: string; // Panchayath / Corporation
   password: string;
   role?: string; // "user" or "admin"
+  isBlocked?: boolean;
   profilePic?: string;
 }
 
@@ -22,7 +23,15 @@ const UserSchema: Schema = new Schema({
   state: { type: String, required: true },
   localBody: { type: String, required: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["user", "admin"], default: "user" },
+ role: {
+  type: String,
+  enum: ["user", "coordinator", "admin", "superadmin"],
+  default: "user"
+},
+isBlocked: {
+  type: Boolean,
+  default: false
+},
   profilePic: { type: String },
 }, { timestamps: true });
 

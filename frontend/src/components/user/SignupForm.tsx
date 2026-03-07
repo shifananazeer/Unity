@@ -1,5 +1,5 @@
 import React from "react";
-import { signupUser } from "../../services/authService";
+import { signupUser } from "../../services/user/authService";
 import Swal from "sweetalert2";
 
 interface SignupFormProps {

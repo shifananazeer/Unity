@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { loginUser } from "../../services/authService";
+import { loginUser } from "../../services/user/authService";
 import Swal from "sweetalert2";
 
 interface LoginFormProps {

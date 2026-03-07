@@ -1,7 +1,7 @@
 interface PaymentOrder {
   orderId: string;
-  amount: number; // in paise
-  month: string;  // added month
+  amount: number;
+  month: string;  
    qrImage?: string;
 }
 

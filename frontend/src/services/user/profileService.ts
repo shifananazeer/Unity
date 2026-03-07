@@ -1,4 +1,4 @@
-import api from "./api"; // import your axios instance
+import api from "../api"; // import your axios instance
 
 // Get user profile
 export const getProfile = async () => {
