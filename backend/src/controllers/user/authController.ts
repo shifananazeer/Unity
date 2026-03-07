@@ -26,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
             password: hashedPassword
         });
         await newUser.save();
-        const token = generateToken(newUser._id.toString());
+        const token = generateToken(newUser._id.toString() , "user");
         res.status(201).json({ message: "User created successfully" , user:newUser, token });
     
     }catch(error){
@@ -50,7 +50,7 @@ export const login = async (req: Request, res: Response) => {
         if(!isMatch){
             return res.status(401).json({ message: "Invalid credentials" });
         }
-        const token = generateToken(user._id.toString());
+        const token = generateToken(user._id.toString() , "user");
         res.status(200).json({ message: "Login successful", user, token });
     }catch(error){
         console.error("Login error:", error);

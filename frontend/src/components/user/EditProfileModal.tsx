@@ -50,7 +50,7 @@ const EditProfileModal: React.FC<Props> = ({ profile, setProfile, onClose }) => 
       />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-2xl mx-4 bg-card rounded-xl shadow-2xl border border-border overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+     <div className="relative z-10 w-full max-w-2xl mx-4 bg-card rounded-xl shadow-2xl border border-border animate-in fade-in-0 zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">
           <h2 className="text-xl font-semibold text-foreground">Edit Profile</h2>
@@ -65,7 +65,7 @@ const EditProfileModal: React.FC<Props> = ({ profile, setProfile, onClose }) => 
         </div>
 
         {/* Content */}
-       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5 overflow-y-auto">
           {/* Name Field */}
           <div className="space-y-2">
             <label htmlFor="fullName" className="text-sm font-medium text-foreground">
@@ -216,7 +216,7 @@ const EditProfileModal: React.FC<Props> = ({ profile, setProfile, onClose }) => 
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/30">
+     <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/30 sticky bottom-0">
           <button
             onClick={onClose}
             disabled={isLoading}

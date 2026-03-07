@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from "../../models/User";
 import mongoose from "mongoose";
+import Payment from "../../models/Payment";
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -113,5 +114,26 @@ export const uploadProfilePic = async (req: AuthenticatedRequest, res: Response)
   } catch (error) {
     console.error("Error uploading profile picture:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getUserPayments = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+     if (!req.user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+     const userId = req.user?.id;
+     console.log("Fetching payments for user ID:", userId);
+
+    const payments = await Payment.find({ userId }).sort({ createdAt: -1 });
+
+    const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
+  console.log("Payments fetched for user:", payments);
+    res.json({
+      payments,
+      totalAmount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching payments" });
   }
 };

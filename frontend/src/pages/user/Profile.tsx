@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getProfile } from "../services/profileService";
-import ProfileCard from "../components/user/ProfileCard";
+import { getProfile } from "../../services/profileService";
+import ProfileCard from "../../components/user/ProfileCard";
+import PaymentHistory from "../../components/user/PaymentHistory";
 
 
 
@@ -42,6 +43,7 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
         )}
+         <PaymentHistory />
       </div>
     </div>
   );

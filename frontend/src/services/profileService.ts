@@ -51,3 +51,18 @@ export const uploadProfilePic = async (file: File ) => {
     throw error;
   }
 };
+
+export const getUserPayments = async () => {
+  const token = localStorage.getItem("token");
+  try {     const res = await api.get("/user/payments", {
+      headers: {
+        Authorization: `Bearer ${token}`,   
+        },
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error("Failed to fetch user payments:", error.response || error.message);
+    throw error;
+  }
+};
+

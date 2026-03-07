@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import ProfilePage from "./pages/Profile";
+import Home from "./pages/user/Home";
+import ProfilePage from "./pages/user/Profile";
 import Navbar from "./components/user/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -14,14 +14,14 @@ function App() {
          <div className="pt-20">
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-        }
-        />
+       <Route
+         path="/profile"
+         element={
+         <ProtectedRoute allowedRoles={["user"]}>
+           <ProfilePage />
+         </ProtectedRoute>
+         }
+      />
       </Routes>
       </div>
     </>
