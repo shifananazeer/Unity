@@ -1,0 +1,49 @@
+{
+  "navbar": {
+    "home": "Home",
+    "about": "About",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "profile": "Profile",
+    "logout": "Logout",
+    "tagline": "A Social Cultural Organization"
+  },
+  "hero": {
+    "tag": "❤️ Empowering Communities",
+    "titleLine1": "Building a Better",
+    "titleHighlight": "Tomorrow, Together",
+    "description": "Unity is a social cultural organization committed to uplifting lives through education, healthcare, and community development programs.",
+    "joinMission": "Join Our Mission →",
+    "learnMore": "Learn More",
+    "pay": "Pay",
+    "preparingQR": "Preparing QR...",
+    "paymentError": "Payment initiation failed. Please try again."
+  },
+  "signup": {
+    "fullName": "Full Name",
+    "mobile": "Mobile Number",
+    "pin": "PIN Code",
+    "district": "District",
+    "state": "State",
+    "localBody": "Panchayath / Corporation",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signupButton": "Sign Up",
+    "success": "Registration Successful"
+  },
+  "login": {
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "button": "Log In",
+    "success": "Login Successful",
+    "failed": "Login Failed",
+    "error": "Something went wrong"
+  },
+  "donation": {
+    "title": "Support Our Mission",
+    "description": "Your contribution helps us empower communities through education, healthcare, and social development programs.",
+    "pay": "Proceed to Payment"
+  }
+}

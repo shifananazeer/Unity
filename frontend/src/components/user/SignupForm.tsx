@@ -1,12 +1,15 @@
 import React from "react";
 import { signupUser } from "../../services/user/authService";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 interface SignupFormProps {
   onClose: () => void;
 }
 
 const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = React.useState({
     fullName: "",
     mobileNumber: "",
@@ -24,7 +27,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-      console.log(formData);
+
     try {
       const res = await signupUser(
         formData.fullName,
@@ -35,29 +38,24 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
         formData.localBody,
         formData.password
       );
+
       localStorage.setItem("token", res.token);
 
-       // Dispatch event so Navbar/Hero rerender
-     window.dispatchEvent(new Event("authChange"));
-    
-      // Close modal
-         onClose();
-     
-         // Success toast
-         Swal.fire({
-           icon: "success",
-           title: "Registration Successful",
-           showConfirmButton: false,
-           timer: 1500,
-           position: "top-end",
-           toast: true,
-         });
-         
-      console.log("Signup successful:", res.data);
+      window.dispatchEvent(new Event("authChange"));
+
+      onClose();
+
+      Swal.fire({
+        icon: "success",
+        title: t("signup.success"),
+        showConfirmButton: false,
+        timer: 1500,
+        position: "top-end",
+        toast: true
+      });
 
     } catch (error: any) {
       console.error("Signup failed:", error);
-      console.log(error.response.data);
     }
   };
 
@@ -66,7 +64,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="text"
-        placeholder="Full Name"
+        placeholder={t("signup.fullName")}
         className="col-span-2 border p-2 rounded-lg"
         name="fullName"
         value={formData.fullName}
@@ -75,7 +73,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="tel"
-        placeholder="Mobile Number"
+        placeholder={t("signup.mobile")}
         className="border p-2 rounded-lg"
         name="mobileNumber"
         value={formData.mobileNumber}
@@ -84,7 +82,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="text"
-        placeholder="PIN Code"
+        placeholder={t("signup.pin")}
         className="border p-2 rounded-lg"
         name="pinCode"
         value={formData.pinCode}
@@ -93,7 +91,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="text"
-        placeholder="District"
+        placeholder={t("signup.district")}
         className="border p-2 rounded-lg"
         name="district"
         value={formData.district}
@@ -102,7 +100,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="text"
-        placeholder="State"
+        placeholder={t("signup.state")}
         className="border p-2 rounded-lg"
         name="state"
         value={formData.state}
@@ -111,7 +109,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="text"
-        placeholder="Panchayath / Corporation"
+        placeholder={t("signup.localBody")}
         className="col-span-2 border p-2 rounded-lg"
         name="localBody"
         value={formData.localBody}
@@ -120,7 +118,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="password"
-        placeholder="Password"
+        placeholder={t("signup.password")}
         className="border p-2 rounded-lg"
         name="password"
         value={formData.password}
@@ -129,7 +127,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
       <input
         type="password"
-        placeholder="Confirm Password"
+        placeholder={t("signup.confirmPassword")}
         className="border p-2 rounded-lg"
         name="confirmPassword"
         value={formData.confirmPassword}
@@ -140,7 +138,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
         type="submit"
         className="col-span-2 bg-teal-700 text-white py-2 rounded-lg hover:bg-teal-800"
       >
-        Sign Up
+        {t("signup.signupButton")}
       </button>
 
     </form>

@@ -1,29 +1,41 @@
-interface PaymentOrder {
-  orderId: string;
-  amount: number;
-  month: string;  
-   qrImage?: string;
-}
+import api from "./../api";
 
-export const initiatePayment = async (): Promise<PaymentOrder> => {
+
+export const createPayment = async (amount: number) => {
   const token = localStorage.getItem("token");
+  console.log("Creating payment with amount:", amount);
   try {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/payment/create-qr`, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+    const res = await api.post("/payment/create-qr", { amount }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     });
-
-    if (!res.ok) {
-      throw new Error(`Server error: ${res.status}`);
-    }
-
-    const data: PaymentOrder = await res.json();
-    return data;
-  } catch (error) {
+    console.log("Payment created:", res.data);
+    return res.data;
+  }
+  catch (error) {
     console.error("Payment initiation failed:", error);
+    throw error;
+  } 
+};
+
+export const uploadPaymentScreenshot = async ( file: File ,paymentId: string) => {
+  const token = localStorage.getItem("token");
+  console.log("Uploading screenshot:", file);
+  try {
+    const formData = new FormData();
+    formData.append("screenshot", file);
+    formData.append("paymentId", paymentId);
+    const res = await api.post("/payment/upload", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`, 
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log("Screenshot uploaded:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Screenshot upload failed:", error);
     throw error;
   }
 };

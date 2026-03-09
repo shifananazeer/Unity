@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { uploadPaymentScreenshot } from "../../services/user/paymentService";
 
 interface PaymentQrModalProps {
   visible: boolean;
   onClose: () => void;
   amount?: number;
   qrImage?: string;
+  paymentId?: string; 
 }
 
 const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
@@ -13,6 +16,7 @@ const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
   onClose,
   amount = 50,
   qrImage = "/qr-code.png",
+  paymentId
 }) => {
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,39 +27,51 @@ const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
     }
   };
 
-  const handleSubmit = async () => {
-    if (!screenshot) {
-      alert("Please upload screenshot");
-      return;
-    }
+ const handleSubmit = async () => {
+  if (!screenshot) {
+    Swal.fire({
+      icon: "warning",
+      title: "Upload Screenshot",
+      text: "Please upload payment screenshot",
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: "top-end",
+    });
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const formData = new FormData();
-      formData.append("screenshot", screenshot);
+    await uploadPaymentScreenshot(screenshot , paymentId || "" ); // pass paymentId to service
 
-      const token = localStorage.getItem("token");
+    Swal.fire({
+      icon: "success",
+      title: "Payment Proof Submitted",
+      timer: 1500,
+      showConfirmButton: false,
+      toast: true,
+      position: "top-end",
+    });
 
-      await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/payment/upload`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    onClose();
+  } catch (error) {
+    console.error(error);
 
-      alert("Payment proof submitted successfully");
-      onClose();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to upload screenshot");
-    } finally {
-      setLoading(false);
-    }
-  };
+    Swal.fire({
+      icon: "error",
+      title: "Upload Failed",
+      text: "Failed to upload screenshot",
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: "top-end",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (!visible) return null;
 

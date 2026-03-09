@@ -1,42 +1,53 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { ISuperAdmin } from "./superadmin";
 
-export interface ISuperAdmin extends Document {
-  name?: string;
-  email: string;
+export interface ISecondAdmin extends Document {
+  fullName?: string;
+  phone?: string;
+  district?: string;
   password: string;
-  isActive: boolean;
+  role?: string;
+   isBlocked?: boolean;
 }
 
-const SuperAdminSchema: Schema = new Schema(
+const SecondAdminSchema: Schema = new Schema(
   {
-    name: {
+    fullName: {
       type: String,
       trim: true,
     },
-
-    email: {
+    phone: {
       type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
       trim: true,
     },
-
+    district: {
+      type: String,
+      trim: true,
+    },
     password: {
       type: String,
       required: true,
     },
 
-    isActive: {
+    isBlocked: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    role: {
+      type: String,
+      enum: ["admin"],
+      default: "admin",
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.model<ISuperAdmin>(
-  "SuperAdmin",
-  SuperAdminSchema,
-  "superadmin" // collection name
+export default mongoose.model<ISecondAdmin>(
+  "SecondAdmin",
+  SecondAdminSchema,
+  "secondadmin" // collection name
 );

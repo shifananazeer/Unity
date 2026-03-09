@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import AuthModal from "./AuthModal";
 import PaymentQrModal from "./PaymentQrModal";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const Hero: React.FC = () => {
+  const { t } = useTranslation();
+
   const [openModal, setOpenModal] = useState(false);
   const [authType, setAuthType] = useState<"signup" | "login">("signup");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
-  const [screenshot, setScreenshot] = useState<File | null>(null);
-
-
+  const navigate = useNavigate();
   const checkLogin = () => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
@@ -27,26 +29,18 @@ const Hero: React.FC = () => {
     setOpenModal(true);
   };
 
-  const handlePayment = async () => {
-    setLoading(true);
-    try {
-    
-      await new Promise((res) => setTimeout(res, 300));
-      setShowQrModal(true); 
-    } catch (error) {
-      console.error("Payment initiation failed:", error);
-      alert("Payment initiation failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setScreenshot(e.target.files[0]);
-      console.log("Uploaded screenshot:", e.target.files[0]);
-    }
-  };
+  // const handlePayment = async () => {
+  //   setLoading(true);
+  //   try {
+  //     await new Promise((res) => setTimeout(res, 300));
+  //     setShowQrModal(true);
+  //   } catch (error) {
+  //     console.error("Payment initiation failed:", error);
+  //     alert(t("hero.paymentError"));
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <section
@@ -61,52 +55,46 @@ const Hero: React.FC = () => {
 
       <div className="relative max-w-7xl mx-auto px-6 text-white text-center">
         <span className="bg-white/20 px-4 py-2 rounded-full text-sm">
-          ❤️ Empowering Communities
+          {t("hero.tag")}
         </span>
 
         <h1 className="text-5xl md:text-6xl font-bold mt-6 leading-tight">
-          Building a Better <br />
-          <span className="text-orange-400">Tomorrow, Together</span>
+          {t("hero.titleLine1")}
+          <br />
+          <span className="text-orange-400">{t("hero.titleHighlight")}</span>
         </h1>
 
         <p className="mt-6 max-w-xl text-lg text-gray-200 mx-auto">
-          Unity is a social cultural organization committed to uplifting lives
-          through education, healthcare, and community development programs.
+          {t("hero.description")}
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4">
           {isLoggedIn ? (
-            <>
-              <button
-                onClick={handlePayment}
-                className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg font-semibold"
-                disabled={loading}
-              >
-                {loading ? "Preparing QR..." : "Pay ₹50"}
-              </button>
-            </>
+            <button
+      onClick={() => navigate("/donation")}
+      className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg font-semibold"
+>
+      {t("hero.pay")}
+      </button>
           ) : (
             <button
               onClick={openSignup}
               className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-lg font-semibold"
             >
-              Join Our Mission →
+              {t("hero.joinMission")}
             </button>
           )}
 
           <button className="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-black transition">
-            Learn More
+            {t("hero.learnMore")}
           </button>
         </div>
       </div>
 
-      {/* Auth Modal */}
       {openModal && (
         <AuthModal type={authType} onClose={() => setOpenModal(false)} />
       )}
 
-    
-      {/* QR Modal */}
       <PaymentQrModal
         visible={showQrModal}
         onClose={() => setShowQrModal(false)}

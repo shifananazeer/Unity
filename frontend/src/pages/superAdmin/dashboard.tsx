@@ -4,6 +4,7 @@ import { getDashboardStats } from "../../services/superAdmin/authService";
 
 const SuperAdminDashboard = () => {
   const [stats, setStats] = useState<any>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {

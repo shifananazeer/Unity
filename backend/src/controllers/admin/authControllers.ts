@@ -1,5 +1,5 @@
 import { Request , Response } from "express";
-import SuperAdmin from "../../models/admin";
+import SuperAdmin from "../../models/superadmin";
 import bcrypt from "bcryptjs";
 import generateToken from "../../utils/generateToken";
 

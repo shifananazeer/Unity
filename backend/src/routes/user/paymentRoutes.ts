@@ -4,6 +4,7 @@ import multer from "multer";
 import path from "path";
 const router = express.Router();
 import { createOrder , uploadScreenshot } from "../../controllers/user/paymentControllers";
+import authMiddleware from "../../middleware/authMiddleware";
 
 // Multer setup
 const storage = multer.diskStorage({
@@ -19,10 +20,10 @@ const upload = multer({ storage });
 
 
 // POST /payment/create-qr
-router.post("/create-qr",createOrder);
+router.post("/create-qr",authMiddleware,createOrder);
 
 // POST /payment/upload-screenshot
-router.post("/upload-screenshot", upload.single("screenshot"), uploadScreenshot);
+router.post("/upload",authMiddleware, upload.single("screenshot"), uploadScreenshot);
 
 
 export default router;

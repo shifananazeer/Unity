@@ -12,7 +12,9 @@ import SuperAdminDashboard from "./pages/superAdmin/dashboard";
 import AdminUsers from "./pages/superAdmin/AdminUsers";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminsPage from "./pages/superAdmin/AdminsPage";
-
+import PaymentsPage from "./pages/superAdmin/PaymentsPage";
+import "./i18n/i18n";
+import DonationPage from "./pages/user/DonationPage";
 function App() {
   return (
     <Routes>
@@ -29,6 +31,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/donation" element={<DonationPage />} />
       </Route>
 
       {/* ADMIN LOGIN */}
@@ -47,6 +50,7 @@ function App() {
   <Route path="dashboard" element={<SuperAdminDashboard />} />
   <Route path="users" element={<AdminUsers />} />
   <Route path="admins" element={<AdminsPage />} />
+  <Route path="payments" element={<PaymentsPage />} />
 </Route>
 
     </Routes>
