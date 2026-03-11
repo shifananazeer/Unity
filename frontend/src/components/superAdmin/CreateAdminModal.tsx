@@ -28,6 +28,7 @@ const CreateAdminModal: React.FC<Props> = ({ onClose, onAdminCreated }) => {
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
+    email:"",
     district: "",
     password: ""
   });
@@ -85,6 +86,16 @@ const CreateAdminModal: React.FC<Props> = ({ onClose, onAdminCreated }) => {
             onChange={handleChange}
             required
           />
+
+           <input
+            type="text"
+            name="email"
+            placeholder="email"
+            className="w-full border p-2 rounded"
+            onChange={handleChange}
+            required
+          />
+
 
           <select
             name="district"

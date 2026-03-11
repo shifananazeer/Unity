@@ -2,8 +2,9 @@ import express from "express";
 import authRoutes from "./routes/user/authRoutes";
 import paymentRoutes from "./routes/user/paymentRoutes";
 import userRoutes from "./routes/user/userRoutes";
-import adminAuthRoutes from "./routes/admin/authRoutes";
-import dashboardRoutes from "./routes/admin/dashboardRoutes";
+import superAuthRoutes from "./routes/superadmin/authRoutes";
+import dashboardRoutes from "./routes/superadmin/dashboardRoutes";
+import adminAuthRoutes from "./routes/admin/adminRoutes";
 import cors from "cors";
 
 const app = express();  
@@ -25,11 +26,15 @@ app.use("/api/payment", paymentRoutes);
 
 app.use("/api/user" , userRoutes)
 
-//adminroutes
+//superadminroutes
 
-app.use("/api/admin", adminAuthRoutes);
+app.use("/api/superadmin", superAuthRoutes);
 
-app.use("/api/admin", dashboardRoutes);
+app.use("/api/superadmin", dashboardRoutes);
+
+//admin routes
+
+ app.use("/api/admin", adminAuthRoutes);
 
 
 

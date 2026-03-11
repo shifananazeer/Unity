@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import StatCard from "../../components/superAdmin/StatCard";
-import { getDashboardStats } from "../../services/superAdmin/authService";
+import StatCard from "../../components/admin/StatCard";
+import { getAdminDashboardStats } from "../../services/admin/adminService";
 
-const SuperAdminDashboard = () => {
+
+const Dashboard = () => {
   const [stats, setStats] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
-      const data = await getDashboardStats();
+      const data = await getAdminDashboardStats();
       setStats(data);
     };
 
@@ -16,8 +17,7 @@ const SuperAdminDashboard = () => {
   }, []);
 
   const statCards = [
-    { title: "Total Users", value: stats?.totalUsers || 0 },
-    { title: "Total Admins", value: stats?.totalAdmins || 0 },
+    { title: "Total Users ", value: stats?.totalUsers || 0 },
     { title: "Total Coordinators", value: stats?.totalCoordinators || 0 },
     { title: "Total Payments", value: stats?.totalPayments || 0 },
     { title: "Pending Payments", value: stats?.pendingPayments || 0 },
@@ -32,4 +32,4 @@ const SuperAdminDashboard = () => {
   );
 };
 
-export default SuperAdminDashboard;
+export default Dashboard;

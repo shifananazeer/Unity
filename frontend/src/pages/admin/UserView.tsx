@@ -1,7 +1,8 @@
 import UsersTable from "../../components/superAdmin/UsersTable";
 import { getUsers } from "../../services/superAdmin/authService";
 import { useEffect, useState } from "react";
-import { toggleAdminBlock , toggleUserBlock } from "../../services/superAdmin/authService";
+import { getUserBasedOnDistrict } from "../../services/admin/adminService";
+import { adminToggleUserBlock } from "../../services/admin/adminService";
 
 interface User {
   _id: string;
@@ -12,14 +13,14 @@ interface User {
 }
 
 
-const AdminUsers = () => {
+const UserView = () => {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
 const [search, setSearch] = useState("");
 const [totalPages, setTotalPages] = useState(1);
 
   const fetchUsers = async () => {
-  const data = await getUsers(page, 5, search);
+  const data = await getUserBasedOnDistrict(page, 5, search);
   setUsers(data.users);
   setTotalPages(data.totalPages);
 };
@@ -29,7 +30,7 @@ const [totalPages, setTotalPages] = useState(1);
   }, [page, search]);
 
   return (
-   <UsersTable
+  <UsersTable
   title="Users"
   users={users}
   refreshUsers={fetchUsers}
@@ -37,15 +38,11 @@ const [totalPages, setTotalPages] = useState(1);
   totalPages={totalPages}
   onPageChange={setPage}
   onSearchChange={setSearch}
-  toggleBlock={async (id, role) => {
-    if (role === "admin") {
-      await toggleAdminBlock(id);
-    } else {
-      await toggleUserBlock(id);
-    }
+  toggleBlock={async (id) => {
+    await adminToggleUserBlock(id);
   }}
 />
   );
 };
 
-export default AdminUsers;
+export default UserView;

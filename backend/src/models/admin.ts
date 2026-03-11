@@ -4,6 +4,7 @@ import { ISuperAdmin } from "./superadmin";
 export interface ISecondAdmin extends Document {
   fullName?: string;
   phone?: string;
+  email?: string
   district?: string;
   password: string;
   role?: string;
@@ -19,6 +20,10 @@ const SecondAdminSchema: Schema = new Schema(
     phone: {
       type: String,
       trim: true,
+    },
+    email: {
+      type : String,
+       trim: true
     },
     district: {
       type: String,

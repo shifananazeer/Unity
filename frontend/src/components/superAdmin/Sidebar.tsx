@@ -8,10 +8,11 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const menu = [
-    { name: "Dashboard", path: "/admin/dashboard" },
-    { name: "Users", path: "/admin/users" },
-    { name: "Coordinators", path: "/admin/coordinators" },
-    { name: "Payments", path: "/admin/payments" },
+    { name: "Dashboard", path: "/superadmin/dashboard" },
+    { name: "Users", path: "/superadmin/users" },
+    { name: "Admins", path: "/superadmin/admins" },
+    { name: "Coordinators", path: "/superadmin/coordinators" },
+    { name: "Payments", path: "/superadmin/payments" },
   ];
 
   return (

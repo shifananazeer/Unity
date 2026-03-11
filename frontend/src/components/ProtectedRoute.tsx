@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 interface Props {
   children: React.ReactNode;
   allowedRoles?: string[];
+  
 }
 
 interface JwtPayload {

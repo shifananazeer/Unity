@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import UsersTable from "../../components/admin/UsersTable";
+import UsersTable from "../../components/superAdmin/UsersTable";
 import { getAdmins } from "../../services/superAdmin/authService";
-import CreateAdminModal from "../../components/admin/CreateAdminModal";
-import EditAdminModal from "../../components/admin/EditAdminModal";
+import CreateAdminModal from "../../components/superAdmin/CreateAdminModal";
+import EditAdminModal from "../../components/superAdmin/EditAdminModal";
 
 const AdminsPage = () => {
   const [admins, setAdmins] = useState([]);

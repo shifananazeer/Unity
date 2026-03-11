@@ -2,8 +2,8 @@ import api from "../api";
 
 
 
-export const adminLogin = async (email: string, password: string) => {
-  const res = await api.post("/admin/login", {
+export const superAdminLogin = async (email: string, password: string) => {
+  const res = await api.post("/superadmin/login", {
     email,
     password,
   });
@@ -12,9 +12,9 @@ console.log("Admin login response:", res.data);
 };
 
 export const getDashboardStats = async () => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("superAdminToken");
   try { 
-    const res = await api.get("/admin/dashboard/stats", {
+    const res = await api.get("/superadmin/dashboard/stats", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,9 +27,13 @@ export const getDashboardStats = async () => {
 };
 
 export const getUsers = async (page = 1, limit = 5, search = "") => {
+  const token = localStorage.getItem("superAdminToken")
   try {
-    const res = await api.get("/admin/users", {
+    const res = await api.get("/superadmin/users", {
       params: { page, limit, search },
+      headers:{
+        Authorization : `Bearer ${token}`
+      }
     });
 
     return res.data;
@@ -40,8 +44,12 @@ export const getUsers = async (page = 1, limit = 5, search = "") => {
 };
 export const getAdmins = async (page = 1, limit = 5, search = "") => {
   try {
-    const res = await api.get("/admin/admins", {
+    const token = localStorage.getItem("superAdminToken")
+    const res = await api.get("/superadmin/admins", {
       params: { page, limit, search },
+      headers:{
+        Authorization: `Bearer ${token}`
+      }
     });
     console.log("Fetched admins:", res.data);
     return res.data;
@@ -51,9 +59,16 @@ export const getAdmins = async (page = 1, limit = 5, search = "") => {
   }   
 };
 
-export const createAdmin = async (adminData: { fullName: string; phone: string; district: string; password: string }) => {
+export const createAdmin = async (adminData: { fullName: string; phone: string;email:string, district: string; password: string }) => {
   try {
-    const res = await api.post("/admin/create-admin", adminData);
+    const token = localStorage.getItem("superAdminToken")
+    const res = await api.post("/superadmin/create-admin", adminData,
+      {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }
+    );
     return res.data;
   } catch (error) {
     console.error("Error creating admin:", error);
@@ -63,13 +78,56 @@ export const createAdmin = async (adminData: { fullName: string; phone: string; 
 
 
 
-export const toggleUserBlock = async(id: string) =>
-  await api.patch(`/users/block/${id}`);
+export const toggleUserBlock = async(id: string) =>{
+  try{
+    const token = localStorage.getItem("superAdminToken");
+    const res = await api.patch(`/superadmin/users/block/${id}`,
+     {
+      headers : {
+       Authorization :`Bearer ${token}`,
+      }
+     })
+     return res.data;
+  }catch (error) {
+    throw error;
+  }
+}
+ 
 
-export const toggleAdminBlock = async (id: string) =>
-  await api.patch(`/admin/block/${id}`);
+export const toggleAdminBlock = async (id: string) =>{
+  try{
+    const token = localStorage.getItem("superAdminToken")
+ const res = await api.patch(`/superadmin/admins/block/${id}`,
+    {
+    headers : {
+    Authorization : `Bearer ${token}`,
+    },
+    }
+  )
+  return res.data;
+  }catch (error){
+    throw error
+  }
+  
+}
 
 export const updateAdmin = async (id: string, data: any) => {
-  const res = await api.put(`/admin/update-admin/${id}`, data);
-  return res.data;
+  try {
+    const token = localStorage.getItem("superAdminToken");
+
+    const res = await api.put(
+      `/superadmin/update-admin/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.data;
+  } catch (error) {
+    console.error("Update admin error:", error);
+    throw error;
+  }
 };

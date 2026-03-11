@@ -1,5 +1,4 @@
 import React from "react";
-import { toggleUserBlock, toggleAdminBlock } from "../../services/superAdmin/authService";
 
 interface User {
   _id: string;
@@ -13,12 +12,14 @@ interface UsersTableProps {
   title: string;
   users: User[];
   refreshUsers: () => void;
+
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   onSearchChange: (value: string) => void;
 
-  // optional edit support
+  toggleBlock?: (id: string, role: string) => Promise<void>;
+
   showEdit?: boolean;
   onEdit?: (user: User) => void;
 }
@@ -31,23 +32,21 @@ const UsersTable: React.FC<UsersTableProps> = ({
   totalPages,
   onPageChange,
   onSearchChange,
+  toggleBlock,
   showEdit = false,
   onEdit,
 }) => {
 
-  const toggleBlock = async (id: string, type: "user" | "admin") => {
-    try {
-      if (type === "user") {
-        await toggleUserBlock(id);
-      } else {
-        await toggleAdminBlock(id);
-      }
+ const handleToggleBlock = async (id: string, role: string) => {
+  try {
+    if (!toggleBlock) return; // check first
 
-      refreshUsers();
-    } catch (error) {
-      console.error("Toggle block error", error);
-    }
-  };
+    await toggleBlock(id, role);
+    refreshUsers();
+  } catch (error) {
+    console.error("Toggle block error", error);
+  }
+};
 
   return (
     <div className="p-6">
@@ -69,6 +68,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
       </div>
 
       <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-slate-200">
+
         <table className="w-full">
 
           {/* TABLE HEADER */}
@@ -76,7 +76,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
             <tr className="text-left">
               <th className="px-6 py-4 font-semibold text-slate-700">Name</th>
               <th className="px-6 py-4 font-semibold text-slate-700">Role</th>
-               <th className="px-6 py-4 font-semibold text-slate-700">District</th>
+              <th className="px-6 py-4 font-semibold text-slate-700">District</th>
               <th className="px-6 py-4 font-semibold text-slate-700">Status</th>
               <th className="px-6 py-4 font-semibold text-slate-700">Action</th>
             </tr>
@@ -84,7 +84,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
 
           {/* TABLE BODY */}
           <tbody className="divide-y divide-slate-200">
-            {users.length > 0 ? (
+            {users?.length > 0 ? (
               users.map((user) => (
                 <tr key={user._id} className="hover:bg-slate-50">
 
@@ -96,8 +96,8 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     {user.role}
                   </td>
 
-                    <td className="px-6 py-4 text-slate-900">
-                    {user.district}
+                  <td className="px-6 py-4 text-slate-700">
+                    {user.district || "-"}
                   </td>
 
                   <td className="px-6 py-4">
@@ -117,10 +117,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     {/* BLOCK BUTTON */}
                     <button
                       onClick={() =>
-                        toggleBlock(
-                          user._id,
-                          user.role === "admin" ? "admin" : "user"
-                        )
+                        handleToggleBlock(user._id, user.role)
                       }
                       className={`px-4 py-2 rounded-lg text-white ${
                         user.isBlocked
@@ -131,7 +128,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
                       {user.isBlocked ? "Unblock" : "Block"}
                     </button>
 
-                    {/* EDIT BUTTON (ONLY FOR ADMINS PAGE) */}
+                    {/* EDIT BUTTON */}
                     {showEdit && (
                       <button
                         onClick={() => onEdit?.(user)}
@@ -147,7 +144,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="text-center py-10 text-slate-500">
+                <td colSpan={5} className="text-center py-10 text-slate-500">
                   No users found
                 </td>
               </tr>
@@ -155,6 +152,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
           </tbody>
 
         </table>
+
       </div>
 
       {/* PAGINATION */}

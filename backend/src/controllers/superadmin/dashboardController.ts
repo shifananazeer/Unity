@@ -99,13 +99,14 @@ export const toggleUserBlock = async (req: Request, res: Response) => {
 
 export const createAdmin = async (req: Request, res: Response) => {
   try {
-    const { fullName, phone, district, password } = req.body;
+    const { fullName, phone,email, district, password } = req.body;
 
     // hash password
      const  hashedPassword = await bcrypt.hash(password, 10);
     const newAdmin = new SecondAdmin({
       fullName,
       phone,
+      email,
       district,
       password: hashedPassword,
     });
