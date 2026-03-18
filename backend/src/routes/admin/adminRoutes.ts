@@ -7,7 +7,13 @@ import {adminLogin,
     createCoordinator ,
     getCoordinators , 
     updateCoordinator ,
-    toggleCoordinatorBlock
+    toggleCoordinatorBlock,
+    getAdminDistrictPayments,
+    updateAdminUpi,
+    getUpi,
+    getCoordinatorsByAdmin,
+    getAdminMissedPayments,
+     removeUser
     } from "../../controllers/admin/adminController";
 
 const router = express.Router();
@@ -28,6 +34,17 @@ router.put("/update-coordinator/:id" , authMiddleware(["admin"]) , updateCoordin
 
 router.patch("/coordinators/block/:id",authMiddleware(["admin"]), toggleCoordinatorBlock);
 
+router.get("/payments" , authMiddleware(["admin"]), getAdminDistrictPayments)
+
+router.put("/admin-upi",authMiddleware(["admin"]), updateAdminUpi);
+
+router.get("/admin-upi" ,authMiddleware(["admin"]) , getUpi)
+
+router.get("/coordinators", authMiddleware(["admin"]) , getCoordinatorsByAdmin);
+
+router.get("/missed-payments",authMiddleware(["admin"]), getAdminMissedPayments);
+
+router.delete("/remove-user/:userId",authMiddleware(["admin"]) , removeUser);
 export default router;
 
 

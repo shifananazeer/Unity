@@ -1,23 +1,21 @@
 import api from "./../api";
 
 
-export const createPayment = async (amount: number) => {
+export const createPayment = async (data: {
+  amount: number;
+  paidTo: "coordinator" | "admin";
+}) => {
   const token = localStorage.getItem("token");
-  console.log("Creating payment with amount:", amount);
-  try {
-    const res = await api.post("/payment/create-qr", { amount }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log("Payment created:", res.data);
-    return res.data;
-  }
-  catch (error) {
-    console.error("Payment initiation failed:", error);
-    throw error;
-  } 
+
+  const res = await api.post("/payment/create", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
 };
+
 
 export const uploadPaymentScreenshot = async ( file: File ,paymentId: string) => {
   const token = localStorage.getItem("token");
@@ -38,4 +36,31 @@ export const uploadPaymentScreenshot = async ( file: File ,paymentId: string) =>
     console.error("Screenshot upload failed:", error);
     throw error;
   }
+};
+
+export const getUpiDetails = async () => {
+   const token = localStorage.getItem("token");
+  const res = await api.get("/payment/upi-details" ,{
+    headers: {
+        Authorization: `Bearer ${token}`, 
+       
+      },
+  });
+  return res.data;
+};
+
+export const confirmPayment = async (paymentId: string) => {
+  const token = localStorage.getItem("token");
+
+  const res = await api.patch(
+    "/payment/confirm",
+    { paymentId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return res.data;
 };

@@ -7,7 +7,7 @@ import { createCoordinator } from "../../services/admin/adminService";
 const CreateCoordinatorModal = ({ onClose, onCoordinatorCreated }: any) => {
 
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [mobileNumber, setmobileNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,7 +24,7 @@ const CreateCoordinatorModal = ({ onClose, onCoordinatorCreated }: any) => {
 
     if (!fullName.trim()) newErrors.fullName = "Name is required";
 
-    if (!phone.match(/^[0-9]{10}$/))
+    if (!mobileNumber.match(/^[0-9]{10}$/))
       newErrors.phone = "Phone must be 10 digits";
 
     if (!email.match(/^\S+@\S+\.\S+$/))
@@ -49,7 +49,7 @@ const CreateCoordinatorModal = ({ onClose, onCoordinatorCreated }: any) => {
 
     const payload = {
       fullName,
-      phone,
+      mobileNumber,
       email,
       password,
       district,
@@ -93,8 +93,8 @@ const CreateCoordinatorModal = ({ onClose, onCoordinatorCreated }: any) => {
           type="text"
           placeholder="Phone"
           className="border w-full p-2 mb-1"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          value={mobileNumber}
+          onChange={(e) => setmobileNumber(e.target.value)}
         />
         <p className="text-red-500 text-sm">{errors.phone}</p>
 

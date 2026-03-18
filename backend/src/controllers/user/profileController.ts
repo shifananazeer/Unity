@@ -11,6 +11,7 @@ interface AuthenticatedRequest extends Request {
 
 // GET PROFILE
 export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
+  console.log("profile controller")
   try {
     if (!req.user?.id) {
       return res.status(401).json({ message: "Unauthorized: no user in request" });
@@ -22,8 +23,10 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const user = await User.findById(userId).select("-password");
-
+    const user = await User.findById(userId)
+  .populate("coordinator", "fullName type") // ✅ ADD THIS
+  .populate("admin", "fullName");
+   console.log("userprofile" , user)
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

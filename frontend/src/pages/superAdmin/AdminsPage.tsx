@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import UsersTable from "../../components/superAdmin/UsersTable";
+import UsersTable from "../../components/UsersTable";
 import { getAdmins } from "../../services/superAdmin/authService";
 import CreateAdminModal from "../../components/superAdmin/CreateAdminModal";
 import EditAdminModal from "../../components/superAdmin/EditAdminModal";
+import { toggleAdminBlock , toggleUserBlock } from "../../services/superAdmin/authService";
 
 const AdminsPage = () => {
   const [admins, setAdmins] = useState([]);
@@ -52,6 +53,13 @@ const AdminsPage = () => {
     setPage(1);
     setSearch(value);
   }}
+   toggleBlock={async (id, role) => {
+      if (role === "admin") {
+        await toggleAdminBlock(id);
+      } else {
+        await toggleUserBlock(id);
+      }
+    }}
   showEdit={true}
   onEdit={(admin) => setEditAdmin(admin)}
 />

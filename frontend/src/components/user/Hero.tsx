@@ -69,22 +69,39 @@ const Hero: React.FC = () => {
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4">
-          {isLoggedIn ? (
-            <button
+         {isLoggedIn ? (
+  <div className="flex flex-col md:flex-row gap-4">
+
+    <button
       onClick={() => navigate("/donation")}
       className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg font-semibold"
->
-      {t("hero.pay")}
-      </button>
-          ) : (
-            <button
-              onClick={openSignup}
-              className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-lg font-semibold"
-            >
-              {t("hero.joinMission")}
-            </button>
-          )}
+    >
+      {t("hero.unitydarmarpan")}
+    </button>
 
+    <button
+      onClick={() => navigate("/direct-selling")}
+      className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg font-semibold"
+    >
+      {t("hero.directSelling")}
+    </button>
+
+    <button
+      onClick={() => navigate("/rd-community")}
+      className="bg-purple-500 hover:bg-purple-600 px-6 py-3 rounded-lg font-semibold"
+    >
+      {t("hero.rdCommunity")}
+    </button>
+
+  </div>
+) : (
+  <button
+    onClick={openSignup}
+    className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-lg font-semibold"
+  >
+    {t("hero.joinMission")}
+  </button>
+)}
           <button className="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-black transition">
             {t("hero.learnMore")}
           </button>
@@ -98,8 +115,8 @@ const Hero: React.FC = () => {
       <PaymentQrModal
         visible={showQrModal}
         onClose={() => setShowQrModal(false)}
-        amount={50}
-        qrImage="/qr-code.png"
+    
+       
       />
     </section>
   );

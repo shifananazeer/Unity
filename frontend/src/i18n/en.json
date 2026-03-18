@@ -15,9 +15,11 @@
     "description": "Unity is a social cultural organization committed to uplifting lives through education, healthcare, and community development programs.",
     "joinMission": "Join Our Mission →",
     "learnMore": "Learn More",
-    "pay": "Pay",
+    "unitydarmarpan": " Unity Darmarpan Community",
     "preparingQR": "Preparing QR...",
-    "paymentError": "Payment initiation failed. Please try again."
+    "paymentError": "Payment initiation failed. Please try again.",
+    "directSelling": "Direct Selling Community",
+    "rdCommunity": "RD Community"
   },
   "signup": {
     "fullName": "Full Name",
@@ -45,5 +47,35 @@
     "title": "Support Our Mission",
     "description": "Your contribution helps us empower communities through education, healthcare, and social development programs.",
     "pay": "Proceed to Payment"
+  },
+   "community": {
+    "title": "Direct Selling Community",
+    "description": "Join our direct selling network and grow with the Elements Unity package.",
+    "joined": "You are already in the Elements Unity Package ✅",
+    "viewPackage": "View Package",
+    "selectPackage": "Select Package",
+    "elementsUnity": "Elements Unity Package",
+    "join": "Join",
+    "confirmTitle": "Confirm Joining",
+    "confirmText": "Are you ready to join {{package}} package?"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+     "close": "Close"
+  },
+  "paymentHistory": {
+    "title": "Payment History",
+    "totalDonated": "Total Donated:",
+    "noPayments": "No payments yet"
+  },
+  "payment": {
+    "confirmTitle": "Did you complete the payment?",
+    "yesCompleted": "Yes",
+    "tryAgain": "Try Again",
+    "uploadScreenshot": "Upload Payment Screenshot (Optional)",
+    "upload": "Upload Screenshot",
+    "skip": "Skip"
   }
 }

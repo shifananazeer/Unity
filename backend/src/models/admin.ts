@@ -3,10 +3,11 @@ import { ISuperAdmin } from "./superadmin";
 
 export interface ISecondAdmin extends Document {
   fullName?: string;
-  phone?: string;
+  mobileNumber?: string;
   email?: string
   district?: string;
   password: string;
+  upiId:string;
   role?: string;
    isBlocked?: boolean;
 }
@@ -17,7 +18,7 @@ const SecondAdminSchema: Schema = new Schema(
       type: String,
       trim: true,
     },
-    phone: {
+    mobileNumber: {
       type: String,
       trim: true,
     },
@@ -33,7 +34,10 @@ const SecondAdminSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-
+      upiId: {
+      type: String,
+      default: ""
+    },
     isBlocked: {
       type: Boolean,
       default: false,

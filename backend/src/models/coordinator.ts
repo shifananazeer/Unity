@@ -7,7 +7,7 @@ const coordinatorSchema = new mongoose.Schema(
       required: true,
     },
 
-    phone: {
+    mobileNumber: {
       type: String,
       required: true,
       unique: true,
@@ -32,11 +32,18 @@ const coordinatorSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+    upiId: {
+      type: String,
+      default: ""
+    },
     type: {
       type: String,
       enum: ["nano", "micro"],
       required: true,
+    },
+    admin:{
+       type: mongoose.Schema.Types.ObjectId,
+        ref: "SecondAdmin",
     },
 
     pin: {

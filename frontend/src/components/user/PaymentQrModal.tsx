@@ -1,25 +1,43 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { uploadPaymentScreenshot } from "../../services/user/paymentService";
+import { getLatestQRCode } from "../../services/superAdmin/authService";
 
 interface PaymentQrModalProps {
   visible: boolean;
   onClose: () => void;
-  amount?: number;
-  qrImage?: string;
-  paymentId?: string; 
+  paymentId?: string;
 }
 
 const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
   visible,
   onClose,
-  amount = 50,
-  qrImage = "/qr-code.png",
   paymentId
 }) => {
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+ const [qrImage, setQrImage] = useState<string | null>(null);
+  const [amount, setAmount] = useState(50);
+
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+  const SERVER_URL = API_URL.replace("/api", "");
+
+  /* Fetch QR */
+  const fetchQR = async () => {
+    try {
+      const data = await getLatestQRCode();
+      setQrImage(`${SERVER_URL}${data.imageUrl}`);
+      setAmount(data.amount || 50);
+    } catch (error) {
+      console.error("Failed to load QR", error);
+    }
+  };
+
+  useEffect(() => {
+    if (visible) {
+      fetchQR();
+    }
+  }, [visible]);
 
   const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -27,51 +45,51 @@ const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
     }
   };
 
- const handleSubmit = async () => {
-  if (!screenshot) {
-    Swal.fire({
-      icon: "warning",
-      title: "Upload Screenshot",
-      text: "Please upload payment screenshot",
-      timer: 2000,
-      showConfirmButton: false,
-      toast: true,
-      position: "top-end",
-    });
-    return;
-  }
+  const handleSubmit = async () => {
+    if (!screenshot) {
+      Swal.fire({
+        icon: "warning",
+        title: "Upload Screenshot",
+        text: "Please upload payment screenshot",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false
+      });
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    await uploadPaymentScreenshot(screenshot , paymentId || "" ); // pass paymentId to service
+      await uploadPaymentScreenshot(screenshot, paymentId || "");
 
-    Swal.fire({
-      icon: "success",
-      title: "Payment Proof Submitted",
-      timer: 1500,
-      showConfirmButton: false,
-      toast: true,
-      position: "top-end",
-    });
+      Swal.fire({
+        icon: "success",
+        title: "Payment Proof Submitted",
+        toast: true,
+        position: "top-end",
+        timer: 1500,
+        showConfirmButton: false
+      });
 
-    onClose();
-  } catch (error) {
-    console.error(error);
+      onClose();
+    } catch (error) {
+      console.error(error);
 
-    Swal.fire({
-      icon: "error",
-      title: "Upload Failed",
-      text: "Failed to upload screenshot",
-      timer: 2000,
-      showConfirmButton: false,
-      toast: true,
-      position: "top-end",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+      Swal.fire({
+        icon: "error",
+        title: "Upload Failed",
+        text: "Failed to upload screenshot",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!visible) return null;
 
@@ -85,13 +103,17 @@ const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
           ✕
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">Scan to Pay ₹{amount}</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Scan to Pay ₹{amount}
+        </h2>
 
-        <img
-          src={qrImage}
-          alt={`QR Code for ₹${amount}`}
-          className="mx-auto w-64 h-64"
-        />
+      {qrImage && (
+  <img
+    src={qrImage}
+    alt="QR Code"
+    className="mx-auto w-64 h-64"
+  />
+)}
 
         <p className="mt-2 text-gray-700 mb-4">
           Use GPay, PhonePe, Paytm, or any UPI app to scan.
@@ -115,8 +137,6 @@ const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
             </p>
           )}
         </div>
-
-        {/* Submit Button */}
 
         <button
           onClick={handleSubmit}

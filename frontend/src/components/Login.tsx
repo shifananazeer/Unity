@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { superAdminLogin } from "../services/superAdmin/authService";
 import { adminLogin } from "../services/admin/adminService";
+import { coordinatorLogin } from "../services/coordinator/CoordinatorService";
 
 interface LoginProps {
-  role: "superadmin" | "admin"; // pass the role
+  role: "superadmin" | "admin" | "coordinator";
 }
 
 const Login: React.FC<LoginProps> = ({ role }) => {
@@ -12,27 +13,43 @@ const Login: React.FC<LoginProps> = ({ role }) => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  const loginMap = {
+    superadmin: superAdminLogin,
+    admin: adminLogin,
+    coordinator: coordinatorLogin,
+  };
+
+  const tokenMap = {
+    superadmin: "superAdminToken",
+    admin: "adminToken",
+    coordinator: "coordinatorToken",
+  };
+
+  const redirectMap = {
+    superadmin: "/superadmin/dashboard",
+    admin: "/admin/dashboard",
+    coordinator: "/coordinator/dashboard",
+  };
+
+  const titleMap = {
+    superadmin: "Super Admin Login",
+    admin: "Admin Login",
+    coordinator: "Coordinator Login",
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Call API based on role
-      const data =
-        role === "superadmin"
-          ? await superAdminLogin(email, password)
-          : await adminLogin(email, password);
+      const loginFunction = loginMap[role];
+      const data = await loginFunction(email, password);
 
       console.log(`${role} login response:`, data);
 
-      // Store token based on role
-      const tokenKey = role === "superadmin" ? "superAdminToken" : "adminToken";
-      localStorage.setItem(tokenKey, data.token);
-      console.log(`${role} token stored in localStorage:`, data.token);
+      localStorage.setItem(tokenMap[role], data.token);
+      console.log(`${role} token stored:`, data.token);
 
-      // Redirect based on role
-      const redirectPath =
-        role === "superadmin" ? "/superadmin/dashboard" : "/admin/dashboard";
-      navigate(redirectPath);
+      navigate(redirectMap[role]);
     } catch (error) {
       console.error(error);
       alert("Invalid credentials");
@@ -46,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ role }) => {
         className="bg-white p-8 rounded-xl shadow-md w-96"
       >
         <h2 className="text-2xl font-bold mb-6 text-center">
-          {role === "superadmin" ? "Super Admin Login" : "Admin Login"}
+          {titleMap[role]}
         </h2>
 
         <input

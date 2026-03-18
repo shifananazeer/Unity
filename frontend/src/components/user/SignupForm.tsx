@@ -11,15 +11,16 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
   const { t } = useTranslation();
 
   const [formData, setFormData] = React.useState({
-    fullName: "",
-    mobileNumber: "",
-    pinCode: "",
-    district: "",
-    state: "",
-    localBody: "",
-    password: "",
-    confirmPassword: ""
-  });
+  fullName: "",
+  mobileNumber: "",
+  pinCode: "",
+  district: "",
+  state: "",
+  localBody: "",
+  password: "",
+  confirmPassword: "",
+  type: "nano" // default
+});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,15 +30,16 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
     e.preventDefault();
 
     try {
-      const res = await signupUser(
-        formData.fullName,
-        formData.mobileNumber,
-        formData.pinCode,
-        formData.district,
-        formData.state,
-        formData.localBody,
-        formData.password
-      );
+     const res = await signupUser(
+  formData.fullName,
+  formData.mobileNumber,
+  formData.pinCode,
+  formData.district,
+  formData.state,
+  formData.localBody,
+  formData.password,
+  formData.type // 👈 add this
+);
 
       localStorage.setItem("token", res.token);
 
@@ -79,7 +81,29 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
         value={formData.mobileNumber}
         onChange={handleChange}
       />
+     <div className="col-span-2 flex gap-4">
+  <label className="flex items-center gap-2">
+    <input
+      type="radio"
+      name="type"
+      value="nano"
+      checked={formData.type === "nano"}
+      onChange={handleChange}
+    />
+    Nano
+  </label>
 
+  <label className="flex items-center gap-2">
+    <input
+      type="radio"
+      name="type"
+      value="micro"
+      checked={formData.type === "micro"}
+      onChange={handleChange}
+    />
+    Micro
+  </label>
+</div>
       <input
         type="text"
         placeholder={t("signup.pin")}

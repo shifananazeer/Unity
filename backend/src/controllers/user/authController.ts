@@ -2,37 +2,75 @@ import { Request , Response } from "express";
 import User from "../../models/User";
 import bcrypt from "bcryptjs";
 import generateToken from "../../utils/generateToken";
+import Coordinator from "../../models/coordinator";
+import SecondAdmin from "../../models/admin"
 
 
 
 export const signup = async (req: Request, res: Response) => {
-    try{
-        const { fullName, mobileNumber, pinCode, district, state, localBody, password } = req.body;
-
-        // Check if user already exists
-        const existingUser = await User.findOne({ mobileNumber });
-        if(existingUser){
-            return res.status(400).json({ message: "User with this mobile number already exists" });
-        }
-        const  hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = new User({
-            fullName,
-            mobileNumber,
-            pinCode,
-            district,
-            state,
-            localBody,
-            password: hashedPassword
-        });
-        await newUser.save();
-        const token = generateToken(newUser._id.toString() , "user");
-        res.status(201).json({ message: "User created successfully" , user:newUser, token });
-    
-    }catch(error){
-        console.error("Signup error:", error);
-        res.status(500).json({ message: "Internal server error" });
+  try {
+    const { fullName, mobileNumber, pinCode, district, state, localBody, password , type } = req.body;
+     if (!fullName || !mobileNumber || !password) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+     const existingUser = await User.findOne({ mobileNumber });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    let coordinatorId = null;
+
+    // ✅ Assign based on type
+    if (type === "nano") {
+      const nanoCoordinator = await Coordinator.findOne({
+        type: "nano",
+        pin: pinCode,
+      });
+
+      coordinatorId = nanoCoordinator?._id;
+    }
+
+    if (type === "micro") {
+      const microCoordinator = await Coordinator.findOne({
+        type: "micro",
+        area: localBody,
+      });
+
+      coordinatorId = microCoordinator?._id;
+    }
+
+    // ✅ Find admin
+    const admin = await SecondAdmin.findOne({ district });
+
+    const newUser = new User({
+      fullName,
+      mobileNumber,
+      pinCode,
+      district,
+      state,
+      localBody,
+      password: hashedPassword,
+      type, // 👈 store type
+      coordinator: coordinatorId, // 👈 single field (better design)
+      admin: admin?._id,
+    });
+
+    await newUser.save();
+
+    const token = generateToken(newUser._id.toString(), "user");
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: newUser,
+      token,
+    });
+
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const login = async (req: Request, res: Response) => {

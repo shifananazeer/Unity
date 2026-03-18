@@ -20,7 +20,7 @@ const Dashboard = () => {
     { title: "Total Users ", value: stats?.totalUsers || 0 },
     { title: "Total Coordinators", value: stats?.totalCoordinators || 0 },
     { title: "Total Payments", value: stats?.totalPayments || 0 },
-    { title: "Pending Payments", value: stats?.pendingPayments || 0 },
+    { title: "Pending Payments", value: stats?.failedPayments || 0 },
   ];
 
   return (

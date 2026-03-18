@@ -1,4 +1,4 @@
-import UsersTable from "../../components/superAdmin/UsersTable";
+import UsersTable from "../../components/UsersTable";
 import { getUsers } from "../../services/superAdmin/authService";
 import { useEffect, useState } from "react";
 import { toggleAdminBlock , toggleUserBlock } from "../../services/superAdmin/authService";
@@ -37,6 +37,7 @@ const [totalPages, setTotalPages] = useState(1);
   totalPages={totalPages}
   onPageChange={setPage}
   onSearchChange={setSearch}
+   showHierarchy={true}
   toggleBlock={async (id, role) => {
     if (role === "admin") {
       await toggleAdminBlock(id);

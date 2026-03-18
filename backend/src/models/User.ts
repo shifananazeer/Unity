@@ -10,6 +10,9 @@ export interface IUser extends Document {
   localBody: string; // Panchayath / Corporation
   password: string;
   role?: string; // "user" or "admin"
+  coordinator:String;
+  
+  admin:string;
   isBlocked?: boolean;
   profilePic?: string;
 }
@@ -27,6 +30,15 @@ const UserSchema: Schema = new Schema({
   type: String,
   enum: ["user", "coordinator", "admin", "superadmin"],
   default: "user"
+},
+coordinator: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Coordinator",
+},
+
+admin:{
+   type: mongoose.Schema.Types.ObjectId,
+  ref: "SecondAdmin",
 },
 isBlocked: {
   type: Boolean,

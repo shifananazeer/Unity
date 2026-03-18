@@ -20,7 +20,7 @@ const SuperAdminDashboard = () => {
     { title: "Total Admins", value: stats?.totalAdmins || 0 },
     { title: "Total Coordinators", value: stats?.totalCoordinators || 0 },
     { title: "Total Payments", value: stats?.totalPayments || 0 },
-    { title: "Pending Payments", value: stats?.pendingPayments || 0 },
+    // { title: "Pending Payments", value: stats?.pendingPayments || 0 },
   ];
 
   return (

@@ -3,9 +3,11 @@ import bcrypt from "bcryptjs";
 import SecondAdmin from "../../models/admin";
 import generateToken from "../../utils/generateToken";
 import { AuthRequest } from "../../middleware/authMiddleware";
-import User from "../../models/User"
+import User ,{IUser} from "../../models/User"
 import Coordinator from "../../models/coordinator";
-
+import Payment ,{IPayment} from "../../models/Payment";
+import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 export const adminLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -37,40 +39,57 @@ export const getAdminDashboardStats = async (req: AuthRequest, res: Response) =>
     if (!adminId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-   console.log("adminId" , adminId)
-    // Find admin info
-    const admin = await SecondAdmin.findById(adminId);
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
-    }
 
-    // Total users in this admin's district/state
-    const totalUsersInThisAdminsControl = await User.countDocuments({
-      district: admin.district,
+    console.log("adminId:", adminId);
+
+    // 1️⃣ Total users under this admin
+    const totalUsers = await User.countDocuments({ admin: adminId });
+
+    // 2️⃣ Total coordinators under this admin
+    const totalCoordinators = await Coordinator.countDocuments({ admin: adminId });
+
+    // 3️⃣ Payments stats
+    // Get all user IDs under this admin
+    const users = await User.find({ admin: adminId }).select("_id");
+    const userIds = users.map((u) => u._id);
+
+    // Count payments by status
+    const payments = await Payment.aggregate([
+      { $match: { userId: { $in: userIds } } },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Initialize counts
+    let totalPayments = 0;
+    let paidCount = 0;
+    let submittedCount = 0;
+    let failedCount = 0;
+
+    payments.forEach((p) => {
+      totalPayments += p.count;
+      if (p._id === "paid") paidCount = p.count;
+      else if (p._id === "submitted") submittedCount = p.count;
+      else failedCount += p.count; // all other statuses
     });
 
-    // // Optional: paid/unpaid users
-    // const totalPaid = await User.countDocuments({
-    //   district: admin.district,
-    //   isPaid: true,
-    // });
-
-    // const totalUnpaid = await User.countDocuments({
-    //   district: admin.district,
-    //   isPaid: false,
-    // });
-
     res.json({
-      totalUsers: totalUsersInThisAdminsControl,
-    //   totalPaid,
-    //   totalUnpaid,
+      totalUsers,
+      totalCoordinators,
+      totalPayments,
+      paidPayments: paidCount,
+      submittedPayments: submittedCount,
+      failedPayments: failedCount,
     });
   } catch (error) {
     console.error("Admin dashboard stats error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const getUserBasedOnDistrict = async (req: AuthRequest, res: Response) => {
   try {
@@ -98,12 +117,13 @@ export const getUserBasedOnDistrict = async (req: AuthRequest, res: Response) =>
       $or: [
         { fullName: { $regex: search, $options: "i" } },
         { mobileNumber: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } }
-      ]
+        { email: { $regex: search, $options: "i" } },
+      ],
     };
 
-    // Get users
+    // Get users with coordinator populated
     const users = await User.find(searchFilter)
+      .populate("coordinator", "fullName type") // <--- populate coordinator
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -114,9 +134,8 @@ export const getUserBasedOnDistrict = async (req: AuthRequest, res: Response) =>
       users,
       totalUsers,
       page,
-      totalPages: Math.ceil(totalUsers / limit)
+      totalPages: Math.ceil(totalUsers / limit),
     });
-
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server error" });
@@ -145,20 +164,40 @@ export const blockUser = async ( req: Request , res: Response) => {
 
 export const createCoordinator = async (req: Request, res: Response) => {
   try {
-    const { fullName, phone, email,password, district, type, pin, area } = req.body;
-     const hashedPassword = await bcrypt.hash(password, 10);
+    const { fullName, mobileNumber, email, password, district, type, pin, area } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    console.log("Incoming district:", district);
+
+    const admin = await SecondAdmin.findOne({
+      district: { $regex: new RegExp(`^${district}$`, "i") },
+    });
+
+    console.log("Found admin:", admin);
+
+    if (!admin) {
+      return res.status(404).json({
+        message: "No admin found for this district",
+      });
+    }
 
     const coordinator = new Coordinator({
       fullName,
-      phone,
+      mobileNumber,
       email,
-      password:hashedPassword,
+      password: hashedPassword,
       district,
       type,
       pin,
       area,
+      admin: admin._id,
     });
-
+console.log("coo.........................." , coordinator)
     await coordinator.save();
 
     res.status(201).json({
@@ -166,9 +205,9 @@ export const createCoordinator = async (req: Request, res: Response) => {
       message: "Coordinator created successfully",
       coordinator,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
+  } catch (error: any) {
+    console.error("CREATE COORDINATOR ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -237,7 +276,7 @@ export const updateCoordinator = async (req: Request, res: Response) => {
 
     // Update basic fields
     coordinator.fullName = fullName || coordinator.fullName;
-    coordinator.phone = phone || coordinator.phone;
+    coordinator.mobileNumber = phone || coordinator.mobileNumber;
     coordinator.email = email || coordinator.email;
     coordinator.district = district || coordinator.district;
     coordinator.type = type || coordinator.type;
@@ -285,5 +324,228 @@ export const toggleCoordinatorBlock = async (req: Request, res: Response) => {
 
   } catch (error) {
     res.status(500).json({ message: "Error updating Coordinator status" });
+  }
+};
+
+export const getAdminDistrictPayments = async (req: Request, res: Response) => {
+  try {
+    const adminId = (req as any).user.id;
+
+    const admin = await SecondAdmin.findById(adminId);
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    const district = admin.district;
+    console.log("Admin district:", district);
+
+    // Get all users in this district
+    const users = await User.find({ district }).select("_id");
+    console.log("Users found:", users);
+
+    const userIds = users.map((u) => u._id);
+    console.log("User IDs:", userIds);
+
+    // Fetch payments for these users and populate user info + coordinator info
+    const payments = await Payment.find({
+      userId: { $in: userIds },
+    }).populate({
+      path: "userId",
+      select: "fullName mobileNumber district coordinator",
+      populate: {
+        path: "coordinator",
+        select: "fullName mobileNumber type", // you can select other fields if needed
+      },
+    });
+
+    console.log("Payments found:", payments);
+
+    res.status(200).json({ payments });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching payments" });
+  }
+};
+
+export const updateAdminUpi = async (req: AuthRequest, res: Response) => {
+  try {
+ 
+     const adminId = req.user?.id;
+ 
+     console.log("Admin ID:", adminId);
+ 
+     const { upiId } = req.body;
+ 
+     const admin = await SecondAdmin.findByIdAndUpdate(
+       adminId,
+       { upiId },
+       { returnDocument: "after" }
+     );
+ 
+     res.json({
+       message: "UPI updated successfully",
+       admin
+     });
+ 
+   } catch (error) {
+     res.status(500).json({ message: "Error updating UPI" });
+   }
+};
+
+export const getUpi = async (req: Request, res: Response) => {
+  try {
+    const adminId = (req as any).user.id;
+
+    const admin = await SecondAdmin.findById(adminId).select("upiId");
+
+    res.json({
+      upiId: admin?.upiId || ""
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching UPI" });
+  }
+};
+
+export const getCoordinatorsByAdmin = async (req: Request, res: Response) => {
+  try {
+    const adminId = (req as any).user.id; // Admin ID from JWT
+
+    // Find coordinators where admin field matches this admin
+    const coordinators = await Coordinator.find({ admin: adminId }).select(
+      "_id fullName type"
+    );
+ console.log("coo details..................................................." , coordinators)
+    res.status(200).json(coordinators);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching coordinators" });
+  }
+};
+
+dayjs.extend(isSameOrAfter);
+
+interface MissedPaymentUser {
+  _id: string;
+  fullName: string;
+  mobileNumber: string;
+  coordinator?: {
+    _id?: string;
+    fullName: string;
+    type?: string;
+  };
+  admin?: {
+    _id?: string;
+    fullName: string;
+  };
+  missedMonths: number;
+}
+
+export const getAdminMissedPayments = async (req: Request, res: Response) => {
+  try {
+    const adminId = (req as any).user?.id;
+    if (!adminId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // ✅ 1️⃣ Get all users under this admin
+    const users: IUser[] = await User.find({ admin: adminId })
+      .populate("coordinator", "fullName type")
+      .populate("admin", "fullName")
+      .select("_id fullName mobileNumber coordinator admin");
+
+    // ✅ 2️⃣ Get all payments for these users
+    const userIds = users.map((u) => u._id);
+    const payments: IPayment[] = await Payment.find({
+      userId: { $in: userIds },
+    }).select("userId month status");
+
+    // ✅ 3️⃣ Map payments by user
+    const paymentsMap = new Map<string, IPayment[]>();
+    payments.forEach((p) => {
+      const key = p.userId.toString();
+      if (!paymentsMap.has(key)) paymentsMap.set(key, []);
+      paymentsMap.get(key)!.push(p);
+    });
+
+    // ✅ 4️⃣ Calculate consecutive missed months
+    const result: MissedPaymentUser[] = users
+      .map((user) => {
+        const userPayments = paymentsMap.get(user._id.toString()) || [];
+
+        const firstPaymentMonth = userPayments.length
+          ? dayjs(
+              userPayments.reduce(
+                (min, p) => (p.month < min ? p.month : min),
+                userPayments[0].month
+              ) + "-01"
+            )
+          : null;
+
+        let consecutiveMissed = 0;
+
+        if (firstPaymentMonth) {
+          let monthCursor = dayjs();
+
+          while (monthCursor.isSameOrAfter(firstPaymentMonth, "month")) {
+            const monthStr = monthCursor.format("YYYY-MM");
+
+            const paid = userPayments.find(
+              (p) => p.month === monthStr && p.status === "paid"
+            );
+
+            if (!paid) {
+              consecutiveMissed++;
+            } else {
+              break;
+            }
+
+            monthCursor = monthCursor.subtract(1, "month");
+          }
+        } else {
+          consecutiveMissed = 0;
+        }
+
+        return {
+          _id: user._id.toString(),
+          fullName: user.fullName,
+          mobileNumber: user.mobileNumber,
+          coordinator: user.coordinator
+            ? {
+                _id: (user.coordinator as any)._id?.toString(),
+                fullName: (user.coordinator as any).fullName || "N/A",
+                type: (user.coordinator as any).type,
+              }
+            : undefined,
+          admin: user.admin
+            ? {
+                _id: (user.admin as any)._id?.toString(),
+                fullName: (user.admin as any).fullName || "N/A",
+              }
+            : undefined,
+          missedMonths: consecutiveMissed,
+        };
+      })
+      .filter((u) => u.missedMonths >= 1);
+
+    console.log("Admin Missed Payments:", result);
+
+    res.status(200).json({ users: result });
+  } catch (error) {
+    console.error("Error fetching admin missed payments:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const removeUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "User removed successfully" });
+  } catch (error) {
+    console.error("Error removing user:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

@@ -2,18 +2,23 @@ import { Navigate } from "react-router-dom";
 
 interface Props {
   children: React.ReactNode;
-  role: "superadmin" | "admin";
+  role: "superadmin" | "admin" | "coordinator";
 }
 
 const AdminProtectedRoute: React.FC<Props> = ({ children, role }) => {
-  // Choose token based on role
-  const tokenKey = role === "superadmin" ? "superAdminToken" : "adminToken";
-  const token = localStorage.getItem(tokenKey);
+
+  const tokenMap = {
+    superadmin: "superAdminToken",
+    admin: "adminToken",
+    coordinator: "coordinatorToken",
+  };
+
+  const token = localStorage.getItem(tokenMap[role]);
 
   console.log(`${role} token in ProtectedRoute:`, token);
 
   if (!token || token === "null" || token === "undefined") {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={`/login/${role}`} replace />;
   }
 
   return <>{children}</>;

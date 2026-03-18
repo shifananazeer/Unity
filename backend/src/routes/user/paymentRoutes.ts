@@ -3,7 +3,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 const router = express.Router();
-import { createOrder , uploadScreenshot } from "../../controllers/user/paymentControllers";
+import { createOrder , uploadScreenshot , createPayment , getUpiDetails , confirmPayment} from "../../controllers/user/paymentControllers";
 import authMiddleware from "../../middleware/authMiddleware";
 
 // Multer setup
@@ -20,10 +20,15 @@ const upload = multer({ storage });
 
 
 // POST /payment/create-qr
-router.post("/create-qr",authMiddleware,createOrder);
+router.post("/create-qr",authMiddleware(["user"]),createOrder);
+
+router.post("/create",authMiddleware(["user"]), createPayment);
 
 // POST /payment/upload-screenshot
-router.post("/upload",authMiddleware, upload.single("screenshot"), uploadScreenshot);
+router.post("/upload",authMiddleware(["user"]), upload.single("screenshot"), uploadScreenshot);
 
+router.get("/upi-details", authMiddleware(["user"]), getUpiDetails);
+
+router.patch("/confirm", authMiddleware(["user"]), confirmPayment);
 
 export default router;

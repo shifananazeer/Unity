@@ -5,6 +5,8 @@ import userRoutes from "./routes/user/userRoutes";
 import superAuthRoutes from "./routes/superadmin/authRoutes";
 import dashboardRoutes from "./routes/superadmin/dashboardRoutes";
 import adminAuthRoutes from "./routes/admin/adminRoutes";
+import coordinatorRoutes from "./routes/coordinator/coordinatorRoutes"
+import chatRoutes from "./routes/chatRoutes"
 import cors from "cors";
 
 const app = express();  
@@ -18,6 +20,7 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("Backend is running successfully 🚀");
 });
+
 
 //user routes
 app.use("/api/auth", authRoutes);
@@ -35,6 +38,13 @@ app.use("/api/superadmin", dashboardRoutes);
 //admin routes
 
  app.use("/api/admin", adminAuthRoutes);
+
+
+ //coordinator  routes 
+
+ app.use("/api/coordinator", coordinatorRoutes)
+
+ app.use("/api/chat" , chatRoutes)
 
 
 

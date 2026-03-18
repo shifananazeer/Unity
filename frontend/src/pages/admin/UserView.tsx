@@ -1,4 +1,4 @@
-import UsersTable from "../../components/superAdmin/UsersTable";
+import UsersTable from "../../components/UsersTable";
 import { getUsers } from "../../services/superAdmin/authService";
 import { useEffect, useState } from "react";
 import { getUserBasedOnDistrict } from "../../services/admin/adminService";
@@ -37,10 +37,13 @@ const [totalPages, setTotalPages] = useState(1);
   page={page}
   totalPages={totalPages}
   onPageChange={setPage}
+  showChat={true}
   onSearchChange={setSearch}
+  showCoordinator={true}
   toggleBlock={async (id) => {
     await adminToggleUserBlock(id);
   }}
+   
 />
   );
 };

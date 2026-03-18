@@ -13,6 +13,7 @@ interface User {
   state?: string;
   localBody?: string;
   profilePicUrl?: string;
+  nanoCoordinator?:string
 }
 
 interface Profile {
@@ -119,6 +120,12 @@ const ProfileCard: React.FC<Props> = ({ profile, setProfile }) => {
                 </span>
               </div>
             </div>
+
+             {/* <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground tracking-tight">
+              {user?.nanoCoordinator || "User"}
+            </h2>
+          </div> */}
 
             {/* State */}
 <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted">

@@ -4,9 +4,12 @@ export interface IPayment extends Document {
   userId: mongoose.Types.ObjectId;    // Reference to User
   amount: number;                     // in paise
   month: string;                      // e.g., "2026-03"
-  status: "created" | "paid" | "failed" | "submitted"; // payment status
+  status: "pending" | "paid" | "failed" | "submitted"; // payment status
   screenshot?: string;                // URL/path to uploaded proof
-  paymentId?: string;                // Razorpay payment ID (optional for static QR)
+  paymentId?: string; 
+  paidTo?:"coordinator"| "admin";
+  nanoCoordinator:mongoose.Types.ObjectId;
+  microCoordinator:mongoose.Types.ObjectId;             
   createdAt: Date;
   updatedAt: Date;
 }
@@ -16,8 +19,15 @@ const paymentSchema = new Schema<IPayment>(
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     amount: { type: Number, required: true },
     month: { type: String, required: true },
+     paidTo: {
+    type: String,
+    enum: ["coordinator", "admin"],
+    required: true
+  },
     paymentId: { type: String }, // for dynamic payments, optional for static QR
-    status: { type: String, enum: ["created", "paid", "failed" , "submitted"], default: "created" },
+    nanoCoordinator: { type: mongoose.Schema.Types.ObjectId, ref: "Coordinator" },
+   microCoordinator: { type: mongoose.Schema.Types.ObjectId, ref: "Coordinator" },
+    status: { type: String, enum: ["pending", "paid", "failed" , "submitted"], default: "pending" },
     screenshot: { type: String },
   },
   { timestamps: true }

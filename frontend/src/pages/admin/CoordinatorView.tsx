@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import UsersTable from "../../components/superAdmin/UsersTable";
+import UsersTable from "../../components/UsersTable";
 import CreateCoordinatorModal from "../../components/admin/CreateCoordinatorModal";
 import EditCoordinatorModal from "../../components/admin/EditCoordinatorModal";
 import { getCoordinators ,toggleCoordinatorBlock } from "../../services/admin/adminService";
@@ -56,6 +56,7 @@ const CoordinatorView = () => {
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}
+          showCoordinatorType
         onSearchChange={(value) => {
           setPage(1);
           setSearch(value);

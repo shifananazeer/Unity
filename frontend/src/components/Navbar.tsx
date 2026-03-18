@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 interface NavbarProps {
-  role: "superadmin" | "admin";
+  role: "superadmin" | "admin" | "coordinator";
   adminName: string;
   toggleSidebar: () => void;
 }
@@ -11,67 +11,88 @@ const Navbar: React.FC<NavbarProps> = ({ role, adminName, toggleSidebar }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-  // remove both tokens
+    if (role === "superadmin") {
+      localStorage.removeItem("superAdminToken");
+      navigate("/login/superadmin");
+    } else if (role === "admin") {
+      localStorage.removeItem("adminToken");
+      navigate("/login/admin");
+    } else if (role === "coordinator") {
+      localStorage.removeItem("coordinatorToken");
+      localStorage.removeItem("coordinatorId"); 
+      navigate("/login/coordinator");
+    }
+  };
 
-  // redirect based on role
-  if (role === "superadmin") {
-    localStorage.removeItem("superAdminToken");
-    navigate("/login/superadmin");
-  } else {
-    localStorage.removeItem("adminToken");
-    navigate("/login/admin");
-  }
-};
+  const getTitle = () => {
+    switch (role) {
+      case "superadmin":
+        return "Super Admin";
+      case "admin":
+        return "Admin";
+      case "coordinator":
+        return "Coordinator";
+      default:
+        return "Dashboard";
+    }
+  };
 
-  // Dynamic title based on role
-  const title = role === "superadmin" ? "Super Admin Dashboard" : "Admin Dashboard";
+  const title = getTitle();
 
   return (
-    <div className="w-full h-14 md:h-16 bg-white shadow flex items-center justify-between px-3 md:px-6">
-      
-      {/* Left Section */}
-      <div className="flex items-center gap-2 md:gap-3">
-        <button className="md:hidden text-2xl mr-3" onClick={toggleSidebar}>
+    <header className="w-full h-14 sm:h-16 bg-white shadow flex items-center justify-between px-3 sm:px-6">
+
+      {/* LEFT */}
+      <div className="flex items-center gap-2 sm:gap-3">
+
+        {/* Mobile Menu */}
+        <button
+          onClick={toggleSidebar}
+          className="md:hidden text-2xl text-gray-700"
+        >
           ☰
         </button>
 
+        {/* Logo */}
         <img
           src="/Unity Logo.jpeg"
           alt="logo"
-          className="w-7 h-7 md:w-9 md:h-9 object-contain"
+          className="w-7 h-7 sm:w-9 sm:h-9 object-contain"
         />
 
-        {/* Dashboard Title */}
-        <h1 className="text-sm md:text-xl font-semibold text-gray-800 whitespace-nowrap">
-          <span className="hidden sm:inline">{title}</span>
+        {/* Title */}
+        <h1 className="text-sm sm:text-lg md:text-xl font-semibold text-gray-800 truncate max-w-[120px] sm:max-w-none">
+          <span className="hidden sm:inline">{title} Dashboard</span>
           <span className="sm:hidden">Dashboard</span>
         </h1>
+
       </div>
 
-      {/* Right Section */}
-      <div className="flex items-center gap-2 md:gap-4">
+      {/* RIGHT */}
+      <div className="flex items-center gap-2 sm:gap-4">
 
-        {/* Avatar + Name */}
+        {/* Avatar */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm md:text-base">
-            {adminName.charAt(0).toUpperCase()}
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+            {adminName?.charAt(0).toUpperCase()}
           </div>
 
+          {/* Hide name on mobile */}
           <span className="hidden md:block text-gray-700 font-medium">
             {adminName}
           </span>
         </div>
 
-        {/* Logout Button */}
+        {/* Logout */}
         <button
           onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-lg text-xs md:text-sm transition"
+          className="bg-red-500 hover:bg-red-600 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm transition"
         >
           Logout
         </button>
 
       </div>
-    </div>
+    </header>
   );
 };
 
