@@ -1,7 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 
+// Create Axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -10,15 +11,13 @@ const api = axios.create({
 });
 
 
-// ✅ REQUEST INTERCEPTOR (attach token automatically)
+
+// ✅ REQUEST INTERCEPTOR: attach token automatically
 api.interceptors.request.use(
   (config) => {
-    const token =
-      localStorage.getItem("superAdminToken") ||
-      localStorage.getItem("adminToken") ||
-      localStorage.getItem("coordinatorToken");
+    const token = localStorage.getItem("token");
 
-    if (token) {
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -36,9 +35,8 @@ api.interceptors.response.use(
       console.log("Token expired or unauthorized");
 
       // ❌ Remove all tokens
-      localStorage.removeItem("superAdminToken");
-      localStorage.removeItem("adminToken");
-      localStorage.removeItem("coordinatorToken");
+    
+      localStorage.removeItem("token");
 
       // 🔁 Redirect based on role (optional smart redirect)
       const currentPath = window.location.pathname;
@@ -50,7 +48,7 @@ api.interceptors.response.use(
       } else if (currentPath.includes("/coordinator")) {
         window.location.href = "/login/coordinator";
       } else {
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     }
 
