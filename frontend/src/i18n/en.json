@@ -63,7 +63,8 @@
     "cancel": "Cancel",
     "yes": "Yes",
     "no": "No",
-     "close": "Close"
+     "close": "Close",
+     "join":"Join"
   },
   "paymentHistory": {
     "title": "Payment History",
