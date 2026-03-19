@@ -87,5 +87,14 @@
     "premiumRD": "Premium RD",
     "confirmJoin": "Confirm Join",
     "confirmMessage": "Are you ready to join {{package}}?"
+  },
+  "about": {
+    "title": "About Unity Darmarpan",
+    "description": "Unity Darmarpan is a charitable community dedicated to helping those in need. We work together to support education, health, and social welfare initiatives in our community.",
+    "communityInfo": "By joining the Unity Darmarpan community, you can participate in meaningful charitable activities and make a real difference in people’s lives.",
+    "donationInfo": "You can contribute by donating any amount between ₹50 to ₹1000. Your support helps us continue our mission and expand our reach to more people in need.",
+    "donateButton": "Donate Now",
+    "joinButton": "Join Community",
+    "footer": "Your contribution, big or small, helps us bring hope and support to many. Join us today and be a part of the Unity Darmarpan movement!"
   }
 }

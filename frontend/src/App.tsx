@@ -32,6 +32,7 @@ import DirectSellingPage from "./pages/user/DirectSellingPage";
 import RDCommunityPage from "./pages/user/RDCommunityPage";
 import SuperAdminProfile from "./pages/superAdmin/SuperAdminProfile";
 import AdminProfile from "./pages/admin/AdminProfile";
+import AboutPage from "./pages/user/AboutPag";
 function App() {
   return (
     <Routes>
@@ -39,6 +40,7 @@ function App() {
       {/* USER ROUTES */}
       <Route element={<UserLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutPage/>}/>
 
         <Route
           path="/profile"
@@ -51,6 +53,7 @@ function App() {
         <Route path="/donation" element={<DonationPage />} />
         <Route path="/direct-selling" element={<DirectSellingPage />} />
         <Route path="/rd-community" element={<RDCommunityPage />} />
+        
       </Route>
 
       {/*  LOGIN */}

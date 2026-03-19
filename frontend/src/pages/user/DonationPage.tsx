@@ -1,38 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { createPayment, getUpiDetails , confirmPayment } from "../../services/user/paymentService";
-import {
-  joinCommunity,
-  getCommunityStatus
-} from "../../services/user/profileService";
-import { uploadPaymentScreenshot } from "../../services/user/paymentService";
+import { createPayment, getUpiDetails, confirmPayment, uploadPaymentScreenshot } from "../../services/user/paymentService";
 
 const DonationPage: React.FC = () => {
   const { t } = useTranslation();
 
   const [amount, setAmount] = useState<number | null>(null);
   const [paymentId, setPaymentId] = useState("");
-
   const [payTarget, setPayTarget] = useState<"coordinator" | "admin">("coordinator");
-
   const [coordinatorUpi, setCoordinatorUpi] = useState("");
   const [adminUpi, setAdminUpi] = useState("");
-
-  const [joined, setJoined] = useState(false);
-
-  const [showPackageModal, setShowPackageModal] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  const [selectedPackage, setSelectedPackage] = useState("Elements Unity");
-
-  const amounts = [50,100,200,300,400,500,600,700,800,900,1000];
-
   const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
-const [showScreenshotUpload, setShowScreenshotUpload] = useState(false);
+  const [showScreenshotUpload, setShowScreenshotUpload] = useState(false);
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
 
-const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const amounts = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 
-  // fetch UPI ids
+  // Fetch UPI IDs
   useEffect(() => {
     const fetchUpi = async () => {
       try {
@@ -43,112 +27,65 @@ const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
         console.error("Failed to fetch UPI details", error);
       }
     };
-
     fetchUpi();
   }, []);
 
   const handleCreatePayment = async () => {
-  try {
-    if (!amount) return;
-
-    const upiId =
-      payTarget === "coordinator"
-        ? coordinatorUpi
-        : adminUpi;
-
-    const name = "Unity Darmarpan";
-    const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
-
-    const data = await createPayment({
-      amount,
-      paidTo: payTarget
-    });
-
-    setPaymentId(data.paymentId);
-
-    // open UPI
-    window.location.href = upiLink;
-
-    // show confirm modal
-    setTimeout(() => {
-      setShowPaymentConfirm(true);
-    }, 2000);
-
-  } catch (error) {
-    console.error("Payment creation failed:", error);
-  }
-};
-  const handleJoin = async () => {
     try {
-      const data = await joinCommunity(selectedPackage);
+      if (!amount) return;
 
-      alert(data.message);
+      const upiId = payTarget === "coordinator" ? coordinatorUpi : adminUpi;
+      const name = "Unity Darmarpan";
+      const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
 
-      setJoined(true);
-      setShowConfirmModal(false);
-      setShowPackageModal(false);
+      const data = await createPayment({ amount, paidTo: payTarget });
+      setPaymentId(data.paymentId);
+
+      // Open UPI app
+      window.location.href = upiLink;
+
+      // Show confirm modal after delay
+      setTimeout(() => setShowPaymentConfirm(true), 2000);
     } catch (error) {
-      console.error(error);
-      alert("Failed to join community");
-    }
-  };
-
-  const handleViewPackage = async () => {
-    try {
-      const status = await getCommunityStatus();
-      setJoined(status.joined);
-
-      if (!status.joined) {
-        setShowPackageModal(true);
-      }
-    } catch (error) {
-      console.error(error);
+      console.error("Payment creation failed:", error);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0] || null;
-  setScreenshotFile(file);
-};
+    const file = e.target.files?.[0] || null;
+    setScreenshotFile(file);
+  };
 
-const handleUploadScreenshot = async () => {
-  if (!screenshotFile) {
-    alert("Please select a screenshot first");
-    return;
-  }
-
-  try {
-    await uploadPaymentScreenshot(screenshotFile, paymentId);
-    alert("Screenshot uploaded successfully");
-
-    setShowScreenshotUpload(false);
-    setScreenshotFile(null);
-
-  } catch (error) {
-    console.error("Upload failed:", error);
-    alert("Failed to upload screenshot");
-  }
-};
+  const handleUploadScreenshot = async () => {
+    if (!screenshotFile) {
+      alert("Please select a screenshot first");
+      return;
+    }
+    try {
+      await uploadPaymentScreenshot(screenshotFile, paymentId);
+      alert("Screenshot uploaded successfully");
+      setShowScreenshotUpload(false);
+      setScreenshotFile(null);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Failed to upload screenshot");
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-orange-50 to-orange-200 px-4 py-12">
-
+      
       {/* Donation Card */}
-
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-2">
           {t("donation.title")}
         </h1>
-
         <p className="text-center text-gray-500 mb-6">
           {t("donation.description")}
         </p>
 
         {/* Payment Target */}
-
         <div className="flex justify-center gap-6 mb-6">
-
           <label className="flex items-center gap-2">
             <input
               type="radio"
@@ -158,7 +95,6 @@ const handleUploadScreenshot = async () => {
             />
             Pay under Coordinator
           </label>
-
           <label className="flex items-center gap-2">
             <input
               type="radio"
@@ -168,15 +104,11 @@ const handleUploadScreenshot = async () => {
             />
             Pay under Admin
           </label>
-
         </div>
 
         {/* Amount Buttons */}
-
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-
           {amounts.map((value) => (
-
             <button
               key={value}
               onClick={() => setAmount(value)}
@@ -188,13 +120,10 @@ const handleUploadScreenshot = async () => {
             >
               ₹{value}
             </button>
-
           ))}
-
         </div>
 
         {/* Pay Button */}
-
         <button
           onClick={handleCreatePayment}
           disabled={!amount}
@@ -206,241 +135,87 @@ const handleUploadScreenshot = async () => {
         >
           {amount ? `Pay ₹${amount}` : t("donation.pay")}
         </button>
-
       </div>
 
-      {/* Community Section */}
-
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 mt-6 text-center">
-
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {t("community.title")}
-        </h2>
-
-        {joined ? (
-
-          <p className="text-green-600 font-semibold text-lg">
-            {t("community.joined")}
-          </p>
-
-        ) : (
-
-          <button
-            onClick={handleViewPackage}
-            className="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700"
-          >
-            {t("community.viewPackage")}
-          </button>
-
-        )}
-
-      </div>
-
-      {/* Package Modal */}
-
-      {showPackageModal && (
-
+      {/* Payment Confirmation Modal */}
+      {showPaymentConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-
-          <div className="bg-white p-6 rounded-xl w-96">
-
-            <h3 className="text-xl font-bold mb-4">
-              {t("community.selectPackage")}
-            </h3>
-
-            <label className="flex items-center gap-3 mb-4">
-
-              <input
-                type="radio"
-                value="Elements Unity"
-                checked={selectedPackage === "Elements Unity"}
-                onChange={(e) => setSelectedPackage(e.target.value)}
-              />
-
-              {t("community.elementsUnity")}
-
-            </label>
-
-            <div className="flex justify-end gap-3">
-
-              <button
-                onClick={() => setShowPackageModal(false)}
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg"
-              >
-                {t("common.cancel")}
-              </button>
-
-              <button
-                onClick={() => setShowConfirmModal(true)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg"
-              >
-                {t("community.join")}
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* Confirmation Modal */}
-
-      {showConfirmModal && (
-
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-
           <div className="bg-white p-6 rounded-xl w-96 text-center">
-
             <h3 className="text-xl font-bold mb-4">
-              {t("community.confirmTitle")}
+              {t("payment.confirmTitle")}
             </h3>
-
-            <p className="mb-6">
-              {t("community.confirmText", { package: selectedPackage })}
-            </p>
-
             <div className="flex justify-center gap-4">
-
               <button
-                onClick={handleJoin}
-                className="px-5 py-2 bg-blue-600 text-white rounded-lg"
+                onClick={async () => {
+                  try {
+                    await confirmPayment(paymentId);
+                    setShowPaymentConfirm(false);
+                    setShowScreenshotUpload(true);
+                  } catch (error) {
+                    console.error("Failed to confirm payment", error);
+                  }
+                }}
+                className="px-5 py-2 bg-green-600 text-white rounded-lg"
               >
-                {t("common.yes")}
+                {t("payment.yesCompleted")}
               </button>
-
               <button
-                onClick={() => setShowConfirmModal(false)}
-                className="px-5 py-2 bg-gray-400 text-white rounded-lg"
+                onClick={() => {
+                  const upiId = payTarget === "coordinator" ? coordinatorUpi : adminUpi;
+                  const name = "Unity Darmarpan";
+                  const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
+                  window.location.href = upiLink;
+                }}
+                className="px-5 py-2 bg-orange-500 text-white rounded-lg"
               >
-                {t("common.no")}
+                {t("payment.tryAgain")}
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
-  {/* Payment Confirmation Modal */}
 
-{showPaymentConfirm && (
+      {/* Screenshot Upload Modal */}
+      {showScreenshotUpload && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-96 relative">
+            <button
+              onClick={() => {
+                setShowScreenshotUpload(false);
+                setScreenshotFile(null);
+              }}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
+            >
+              {t("common.close")}
+            </button>
+            <h3 className="text-xl font-bold mb-4 text-center">
+              {t("payment.uploadScreenshot")}
+            </h3>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="mb-4 w-full"
+            />
+            <button
+              onClick={handleUploadScreenshot}
+              className="w-full bg-blue-600 text-white py-2 rounded-lg mb-2"
+            >
+              {t("payment.upload")}
+            </button>
+            <button
+              onClick={() => {
+                setShowScreenshotUpload(false);
+                setScreenshotFile(null);
+              }}
+              className="w-full bg-gray-400 text-white py-2 rounded-lg"
+            >
+              {t("payment.skip")}
+            </button>
+          </div>
+        </div>
+      )}
 
-  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-
-    <div className="bg-white p-6 rounded-xl w-96 text-center">
-
-      <h3 className="text-xl font-bold mb-4">
-        {t("payment.confirmTitle")}
-      </h3>
-
-      <div className="flex justify-center gap-4">
-
-       <button
-  onClick={async () => {
-    try {
-
-      await confirmPayment(paymentId);
-
-      setShowPaymentConfirm(false);
-      setShowScreenshotUpload(true);
-
-    } catch (error) {
-      console.error("Failed to confirm payment", error);
-    }
-  }}
-  className="px-5 py-2 bg-green-600 text-white rounded-lg"
->
-  {t("payment.yesCompleted")}
-</button>
-
-        <button
-          onClick={() => {
-
-            const upiId =
-              payTarget === "coordinator"
-                ? coordinatorUpi
-                : adminUpi;
-
-            const name = "Unity Darmarpan";
-
-            const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
-
-            window.location.href = upiLink;
-
-          }}
-          className="px-5 py-2 bg-orange-500 text-white rounded-lg"
-        >
-          {t("payment.tryAgain")}
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-)}
-
-
-
-{/* Screenshot Upload Modal */}
-
-{showScreenshotUpload && (
-
-  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-
-    <div className="bg-white p-6 rounded-xl w-96 relative">
-
-      {/* Close Button */}
-
-      <button
-        onClick={() => {
-          setShowScreenshotUpload(false);
-          setScreenshotFile(null);
-        }}
-        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
-      >
-        {t("common.close")}
-      </button>
-
-      <h3 className="text-xl font-bold mb-4 text-center">
-        {t("payment.uploadScreenshot")}
-      </h3>
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="mb-4 w-full"
-      />
-
-      <button
-        onClick={handleUploadScreenshot}
-        className="w-full bg-blue-600 text-white py-2 rounded-lg mb-2"
-      >
-        {t("payment.upload")}
-      </button>
-
-      {/* Skip Button */}
-
-      <button
-        onClick={() => {
-          setShowScreenshotUpload(false);
-          setScreenshotFile(null);
-        }}
-        className="w-full bg-gray-400 text-white py-2 rounded-lg"
-      >
-        {t("payment.skip")}
-      </button>
-
-    </div>
-
-  </div>
-
-)}
     </div>
   );
 };
