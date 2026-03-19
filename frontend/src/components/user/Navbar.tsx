@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
 
   return (
     <header className="w-full border-b bg-white">
-      <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 px-4 md:px-8 py-3 flex justify-between items-center">
+  <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 px-4 md:px-8 py-3 flex justify-between items-center">
 
         {/* Logo */}
         <div className="flex items-center gap-2">
@@ -145,67 +145,88 @@ const Navbar: React.FC = () => {
       </nav>
 
       {/* Mobile Menu */}
-      {mobileMenu && (
-        <div className="md:hidden fixed top-16 left-0 w-full bg-white shadow-lg p-6 flex flex-col gap-4 z-40">
+     {mobileMenu && (
+  <div className="md:hidden fixed top-16 left-0 w-full bg-white shadow-lg p-6 flex flex-col gap-4 z-40">
 
-          <span
-            onClick={() => navigate("/")}
-            className="cursor-pointer"
-          >
-            {t("navbar.home")}
-          </span>
+    <span
+      onClick={() => {
+        navigate("/");
+        setMobileMenu(false);
+      }}
+      className="cursor-pointer"
+    >
+      {t("navbar.home")}
+    </span>
 
-          <span
-            onClick={() => navigate("/about")}
-            className="cursor-pointer"
-          >
-            {t("navbar.about")}
-          </span>
+    <span
+      onClick={() => {
+        navigate("/about");
+        setMobileMenu(false);
+      }}
+      className="cursor-pointer"
+    >
+      {t("navbar.about")}
+    </span>
 
-          <select
-            onChange={(e) => changeLanguage(e.target.value)}
-            value={i18n.language}
-            className="border rounded px-2 py-2"
-          >
-            <option value="en">English</option>
-            <option value="ml">Malayalam</option>
-          </select>
+    <select
+      onChange={(e) => {
+        changeLanguage(e.target.value);
+        setMobileMenu(false);
+      }}
+      value={i18n.language}
+      className="border rounded px-2 py-2"
+    >
+      <option value="en">English</option>
+      <option value="ml">Malayalam</option>
+    </select>
 
-          {isLoggedIn ? (
-            <>
-              <button
-                onClick={() => navigate("/profile")}
-                className="bg-blue-600 text-white py-2 rounded-lg"
-              >
-                {t("navbar.profile")}
-              </button>
+    {isLoggedIn ? (
+      <>
+        <button
+          onClick={() => {
+            navigate("/profile");
+            setMobileMenu(false);
+          }}
+          className="bg-blue-600 text-white py-2 rounded-lg"
+        >
+          {t("navbar.profile")}
+        </button>
 
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white py-2 rounded-lg"
-              >
-                {t("navbar.logout")}
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={openLogin}
-                className="border py-2 rounded-lg"
-              >
-                {t("navbar.login")}
-              </button>
+        <button
+          onClick={() => {
+            handleLogout();
+            setMobileMenu(false);
+          }}
+          className="bg-red-600 text-white py-2 rounded-lg"
+        >
+          {t("navbar.logout")}
+        </button>
+      </>
+    ) : (
+      <>
+        <button
+          onClick={() => {
+            openLogin();
+            setMobileMenu(false);
+          }}
+          className="border py-2 rounded-lg"
+        >
+          {t("navbar.login")}
+        </button>
 
-              <button
-                onClick={openSignup}
-                className="bg-teal-700 text-white py-2 rounded-lg"
-              >
-                {t("navbar.signup")}
-              </button>
-            </>
-          )}
-        </div>
-      )}
+        <button
+          onClick={() => {
+            openSignup();
+            setMobileMenu(false);
+          }}
+          className="bg-teal-700 text-white py-2 rounded-lg"
+        >
+          {t("navbar.signup")}
+        </button>
+      </>
+    )}
+  </div>
+)}
 
       {openModel && (
         <AuthModal type={authType} onClose={() => setOpenModel(false)} />
