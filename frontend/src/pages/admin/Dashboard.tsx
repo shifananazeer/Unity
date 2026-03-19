@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import StatCard from "../../components/admin/StatCard";
 import { getAdminDashboardStats, getUserBasedOnDistrict, getPaymentsBasedOnDistrict } from "../../services/admin/adminService";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, ResponsiveContainer } from "recharts";

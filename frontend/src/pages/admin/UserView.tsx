@@ -1,16 +1,8 @@
 import UsersTable from "../../components/UsersTable";
-import { getUsers } from "../../services/superAdmin/authService";
 import { useEffect, useState } from "react";
 import { getUserBasedOnDistrict } from "../../services/admin/adminService";
 import { adminToggleUserBlock } from "../../services/admin/adminService";
 
-interface User {
-  _id: string;
-  name: string;
-  phone: string;
-  role: string;
-  isBlocked: boolean;
-}
 
 
 const UserView = () => {

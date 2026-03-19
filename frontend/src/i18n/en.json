@@ -77,5 +77,15 @@
     "uploadScreenshot": "Upload Payment Screenshot (Optional)",
     "upload": "Upload Screenshot",
     "skip": "Skip"
+  },
+  "rdCommunity": {
+    "title": "RD Community",
+    "joinedSuccess": "Joined successfully",
+    "viewPackages": "View Packages",
+    "selectPackage": "Select RD Package",
+    "basicRD": "Basic RD",
+    "premiumRD": "Premium RD",
+    "confirmJoin": "Confirm Join",
+    "confirmMessage": "Are you ready to join {{package}}?"
   }
 }

@@ -3,13 +3,7 @@ import { getUsers } from "../../services/superAdmin/authService";
 import { useEffect, useState } from "react";
 import { toggleAdminBlock , toggleUserBlock } from "../../services/superAdmin/authService";
 
-interface User {
-  _id: string;
-  name: string;
-  phone: string;
-  role: string;
-  isBlocked: boolean;
-}
+
 
 
 const AdminUsers = () => {
@@ -34,6 +28,13 @@ const [loading, setLoading] = useState(false);
   useEffect(() => {
     fetchUsers();
   }, [page, search]);
+if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-gray-500 text-lg">Loading users...</p>
+      </div>
+    );
+  }
 
   return (
    <UsersTable

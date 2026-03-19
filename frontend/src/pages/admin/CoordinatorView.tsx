@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import UsersTable from "../../components/UsersTable";
 import CreateCoordinatorModal from "../../components/admin/CreateCoordinatorModal";
 import EditCoordinatorModal from "../../components/admin/EditCoordinatorModal";

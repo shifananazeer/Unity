@@ -13,7 +13,6 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import UserView from "./pages/admin/UserView";
 import "./i18n/i18n";
 import DonationPage from "./pages/user/DonationPage";
-import PaymentsPage from "./pages/superAdmin/PaymentsPage";
 import Layout from "./layouts/AdminLayout";
 import AdminsPage from "./pages/superAdmin/AdminsPage";
 import CoordinatorView from "./pages/admin/CoordinatorView";

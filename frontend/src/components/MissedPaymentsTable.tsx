@@ -20,7 +20,6 @@ interface Props {
 const MissedPaymentsTable: React.FC<Props> = ({
   users,
   role,
-  showHierarchy = false,
   onRemove,
 }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);

@@ -1,5 +1,4 @@
 import UsersTable from "../../components/UsersTable";
-import { getUsers } from "../../services/superAdmin/authService";
 import { useEffect, useState } from "react";
 import { toggleAdminBlock , toggleUserBlock ,  } from "../../services/superAdmin/authService";
 import { getCoordinators } from "../../services/superAdmin/authService";

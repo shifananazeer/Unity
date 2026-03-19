@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AdminCoordinatorChatModal from "./AdminCoordinatorChatModal";
 import UserDetailsModal from "./UserDetailsModal";
 
@@ -64,7 +63,6 @@ const UsersTable: React.FC<UsersTableProps> = ({
   showCoordinator = false,
   showCoordinatorExtra = false, // default false
 }) => {
-  const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [detailsUser, setDetailsUser] = useState<string | null>(null);

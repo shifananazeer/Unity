@@ -19,7 +19,7 @@ const EditProfileModal: React.FC<Props> = ({ profile, setProfile, onClose }) => 
   localBody: profile?.localBody || "",
 });
 
-  const [file, setFile] = useState<File | null>(null);
+  const [file] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const token = localStorage.getItem("token");
 

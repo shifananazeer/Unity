@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { districts } from "../superAdmin/CreateAdminModal";
 import { createCoordinator } from "../../services/admin/adminService";
 

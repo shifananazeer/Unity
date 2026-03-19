@@ -10,7 +10,7 @@ const Hero: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [authType, setAuthType] = useState<"signup" | "login">("signup");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const navigate = useNavigate();
   const checkLogin = () => {
