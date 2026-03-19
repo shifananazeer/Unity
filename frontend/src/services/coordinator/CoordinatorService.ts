@@ -13,7 +13,7 @@ console.log("coordinator login response:", res.data);
 
 export const getCoordinatorDashboardStats = async () => {
      const token  = localStorage.getItem("token")
-     console.log("coordinator token " , token)
+     console.log("/coordinator token " , token)
       try {
         const res = await api.get("/coordinator/dashboard-stats" ,{
             headers:{
