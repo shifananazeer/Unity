@@ -13,37 +13,39 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, role }) => {
   const menuItems = {
     superadmin: [
       { name: "Dashboard", path: "/superadmin/dashboard" },
-      { name: "Users", path: "/superadmin/users" },
-      { name: "Admins", path: "/superadmin/admins" },
-      { name: "Coordinators", path: "/superadmin/coordinators" },
-      { name: "Payments", path: "/superadmin/payments" },
-      { name: "QR management " , path: "/superadmin/qrcode"}
+      { name: "Unity Members", path: "/superadmin/users" },
+      { name: "Unity Admins", path: "/superadmin/admins" },
+      { name: "Unity Coordinators", path: "/superadmin/coordinators" },
+      { name: "Unity Payments", path: "/superadmin/payments" },
+      // { name: "QR management " , path: "/superadmin/qrcode"}
+      { name: "Creater Profile" , path:"/superadmin/profile"}
     ],
 
     admin: [
       { name: "Dashboard", path: "/admin/dashboard" },
-      { name: "Users", path: "/admin/users" },
-      { name: "Coordinators", path: "/admin/coordinators" },
-      { name: "Payments", path: "/admin/payments" },
+      { name: "Unity Members", path: "/admin/users" },
+      { name: "Unity Coordinators", path: "/admin/coordinators" },
+      { name: "Unity Payments", path: "/admin/payments" },
       { name: "UPI Management", path: "/admin/upi" },
-       { name : "Missed Payments" , path: "/admin/missedPayments"}
+       { name : "Missed Payments" , path: "/admin/missedPayments"},
+       { name: "Incharge Profile" , path:"/admin/profile"}
     ],
 
     coordinator: [
       { name: "Dashboard", path: "/coordinator/dashboard" },
-      { name: "Users", path: "/coordinator/users" },
-      { name: "Payments", path: "/coordinator/payments" },
+      { name: "Unity Members", path: "/coordinator/users" },
+      { name: "Unity Payments", path: "/coordinator/payments" },
      { name: "UPI Management", path: "/coordinator/upi" },
-      { name: "Profile", path: "/coordinator/profile" },
+      { name: "Coordinator Profile", path: "/coordinator/profile" },
       { name : "Missed Payments" , path: "/coordinator/missedPayments"}
       
     ],
   };
 
   const panelTitle = {
-    superadmin: "Super Admin Panel",
-    admin: "Admin Panel",
-    coordinator: "Coordinator Panel",
+    superadmin: "Unity Creater Panel",
+    admin: "Unity Incharge Panel",
+    coordinator: "Unity Coordinator Panel",
   };
 
   const menu = menuItems[role];

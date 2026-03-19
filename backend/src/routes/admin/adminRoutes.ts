@@ -13,7 +13,9 @@ import {adminLogin,
     getUpi,
     getCoordinatorsByAdmin,
     getAdminMissedPayments,
-     removeUser
+     removeUser,
+     adminProfile,
+     changeAdminPassword
     } from "../../controllers/admin/adminController";
 
 const router = express.Router();
@@ -45,6 +47,10 @@ router.get("/coordinators", authMiddleware(["admin"]) , getCoordinatorsByAdmin);
 router.get("/missed-payments",authMiddleware(["admin"]), getAdminMissedPayments);
 
 router.delete("/remove-user/:userId",authMiddleware(["admin"]) , removeUser);
+
+router.get("/profile" , authMiddleware(["admin"]), adminProfile)
+
+router.put( "/change-password",authMiddleware(["admin"]),changeAdminPassword);
 export default router;
 
 

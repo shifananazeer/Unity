@@ -1,7 +1,7 @@
 import api from "../api";
 
 export const getAdminDashboardStats = async () => {
-    const token  = localStorage.getItem("adminToken")
+    const token  = localStorage.getItem("token")
     console.log("tokrn ", token)
     try {
         const res = await api.get("/admin/dashboard-stats" ,{
@@ -22,13 +22,15 @@ export const adminLogin = async (email: string, password: string) => {
     email,
     password,
   });
+   localStorage.setItem("adminId", res.data.admin._id);
+  console.log("Id" , res.data.admin._id)
 console.log("Admin login response:", res.data);
   return res.data;
 };
 
 
 export const getUserBasedOnDistrict = async(page = 1 , limit = 5 , search = "") => {
-const token = localStorage.getItem("adminToken")
+const token = localStorage.getItem("token")
 try{
     const res = await api.get("/admin/users", {
         params: { page, limit, search },
@@ -46,7 +48,7 @@ try{
 
 export const adminToggleUserBlock = async (userId: string) => {
   try {
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem("token");
 
     const res = await api.patch(
       `/admin/toggle-user-block/${userId}`,
@@ -67,7 +69,7 @@ export const adminToggleUserBlock = async (userId: string) => {
 
 export const getCoordinators = async (page = 1, limit = 5 , search ="") => {
  try {
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem("token");
 
     const res = await api.get( "/admin/get-coordinators",{
    params: { page, limit, search },
@@ -86,7 +88,7 @@ console.log("Coordinator data" , res.data)
 
 export const updateCoordinator = async (id: string, data: any) => {
   try {
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem("token");
 
     const res = await api.put(
       `/admin/update-coordinator/${id}`,
@@ -108,7 +110,7 @@ export const updateCoordinator = async (id: string, data: any) => {
 export const createCoordinator = async (data: any) => {
   try{
     console.log("create admin" , data)
-  const token = localStorage.getItem("adminToken")
+  const token = localStorage.getItem("token")
   const response = await api.post(
     "/admin/create-coordinator",
     data,{
@@ -127,7 +129,7 @@ export const createCoordinator = async (data: any) => {
 
 export const toggleCoordinatorBlock = async (id: string) =>{
   try{
-    const token = localStorage.getItem("adminToken")
+    const token = localStorage.getItem("token")
  const res = await api.patch(`/admin/coordinators/block/${id}`,
   {},
     {
@@ -145,7 +147,7 @@ export const toggleCoordinatorBlock = async (id: string) =>{
 
 export const getPaymentsBasedOnDistrict = async () => {
   try{
-    const token = localStorage.getItem("adminToken")
+    const token = localStorage.getItem("token")
     const res = await api.get("/admin/payments",
       {
         headers:{
@@ -162,7 +164,7 @@ export const getPaymentsBasedOnDistrict = async () => {
 }
 
 export const getAdminUpi = async () => {
-    const token = localStorage.getItem("adminToken")
+    const token = localStorage.getItem("token")
   const res = await api.get("/admin/admin-upi" ,
      {
         headers:{
@@ -174,7 +176,7 @@ export const getAdminUpi = async () => {
 };
 
 export const updateAdminUpi = async (upiId: string) => {
-    const token = localStorage.getItem("adminToken")
+    const token = localStorage.getItem("token")
   const res = await api.put("/admin/admin-upi", { upiId },
      {
         headers:{
@@ -187,7 +189,7 @@ export const updateAdminUpi = async (upiId: string) => {
 
 export const getCoordinatorsByAdmin = async () => {
   try {
-     const token = localStorage.getItem("adminToken")
+     const token = localStorage.getItem("token")
     const response = await api.get("/admin/coordinators", {
       
         headers:{
@@ -205,7 +207,7 @@ export const getCoordinatorsByAdmin = async () => {
 export const  getAdminMissedpayments = async ()=> {
     try {
     console.log("service")
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem("token");
     const res = await api.get("/admin/missed-payments", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -221,7 +223,7 @@ export const  getAdminMissedpayments = async ()=> {
 
 export const removeUser = async (userId: string) => {
   try {
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem("token");
 
     const res = await api.delete(`/admin/remove-user/${userId}`, {
       headers: {
@@ -232,6 +234,47 @@ export const removeUser = async (userId: string) => {
     return res.data;
   } catch (error) {
     console.error("Failed to delete user:", error);
+    throw error;
+  }
+};
+export const getAdminProfile = async () => {
+  try{
+    const token = localStorage.getItem("token")
+    const res = await api.get("/admin/profile",
+      {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }
+    )
+    console.log("profile" , res.data)
+    return res.data;
+  }catch (error) {
+ console.error("Error fetching profile:", error);
+    return [];
+  }   
+}
+
+export const changeAdminPassword = async (data: {
+  currentPassword: string;
+  newPassword: string;
+}) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await api.put(
+      "/admin/change-password",
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Change password error:", error.response?.data || error);
     throw error;
   }
 };

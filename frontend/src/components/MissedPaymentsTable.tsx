@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import ChatModal from "../components/ChatModal"; // adjust path
-
+import AdminCoordinatorChatModal from "./AdminCoordinatorChatModal";
 interface User {
   _id: string;
   fullName: string;
@@ -29,7 +28,7 @@ const MissedPaymentsTable: React.FC<Props> = ({
 
   // Logged-in user ID (coordinator or admin)
   const loggedInUserId =
-    localStorage.getItem("userId") || // all users have userId
+    
     localStorage.getItem(role === "coordinator" ? "coordinatorId" : "adminId") ||
     "";
 
@@ -125,13 +124,15 @@ const MissedPaymentsTable: React.FC<Props> = ({
 
       {/* Chat Modal for both coordinator/admin */}
       {selectedUser && (
-        <ChatModal
-          isOpen={chatOpen}
-          onClose={() => setChatOpen(false)}
-          userId={loggedInUserId} // logged-in coordinator/admin
-          receiverId={selectedUser._id} // selected user
-          receiverName={selectedUser.fullName}
-        />
+      <AdminCoordinatorChatModal
+  isOpen={chatOpen}
+  onClose={() => setChatOpen(false)}
+  userId={loggedInUserId}
+  userRole={role}             // admin or coordinator
+  receiverId={selectedUser._id}
+  receiverRole="user"         // user being messaged
+  receiverName={selectedUser.fullName}
+/>
       )}
     </div>
   );

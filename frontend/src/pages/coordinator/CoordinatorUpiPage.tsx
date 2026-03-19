@@ -21,6 +21,13 @@ const CoordinatorUpiPage: React.FC = () => {
 
   return (
     <div className="p-6">
+       <h2 className="text-lg font-semibold mb-4">Your UPI ID</h2>
+
+      {/* ✅ Show current UPI */}
+      <p className="mb-4 text-gray-700">
+        <strong>Current UPI:</strong>{" "}
+        {upi ? upi : "Not set"}
+      </p>
       <UpiForm currentUpi={upi} onSave={handleSave} />
     </div>
   );

@@ -10,7 +10,7 @@ interface SignupFormProps {
 const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
   const { t } = useTranslation();
 
-  const [formData, setFormData] = React.useState({
+ const [formData, setFormData] = React.useState({
   fullName: "",
   mobileNumber: "",
   pinCode: "",
@@ -19,7 +19,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
   localBody: "",
   password: "",
   confirmPassword: "",
-  type: "nano" // default
+  type: "nano",
+  referralCode: "" 
 });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +39,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
   formData.state,
   formData.localBody,
   formData.password,
-  formData.type // 👈 add this
+  formData.type ,
+  formData.referralCode
 );
 
       localStorage.setItem("token", res.token);
@@ -58,6 +60,16 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
 
     } catch (error: any) {
       console.error("Signup failed:", error);
+
+  const message =
+    error?.response?.data?.message || "Signup failed. Try again.";
+
+  Swal.fire({
+    icon: "error",
+    title: "Signup Failed",
+    text: message,
+    confirmButtonColor: "#d33",
+  });
     }
   };
 
@@ -157,6 +169,15 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose }) => {
         value={formData.confirmPassword}
         onChange={handleChange}
       />
+
+      <input
+  type="text"
+  placeholder="Referral Code (Optional)"
+  className="col-span-2 border p-2 rounded-lg"
+  name="referralCode"
+  value={formData.referralCode}
+  onChange={handleChange}
+/>
 
       <button
         type="submit"

@@ -188,7 +188,7 @@ const EditProfileModal: React.FC<Props> = ({ profile, setProfile, onClose }) => 
           </div>
 
           {/* File Upload */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label htmlFor="photo" className="text-sm font-medium text-foreground">
               Profile Photo
             </label>
@@ -212,7 +212,7 @@ const EditProfileModal: React.FC<Props> = ({ profile, setProfile, onClose }) => 
                 className="sr-only"
               />
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Footer */}

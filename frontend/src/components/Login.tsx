@@ -19,12 +19,6 @@ const Login: React.FC<LoginProps> = ({ role }) => {
     coordinator: coordinatorLogin,
   };
 
-  const tokenMap = {
-    superadmin: "superAdminToken",
-    admin: "adminToken",
-    coordinator: "coordinatorToken",
-  };
-
   const redirectMap = {
     superadmin: "/superadmin/dashboard",
     admin: "/admin/dashboard",
@@ -46,8 +40,16 @@ const Login: React.FC<LoginProps> = ({ role }) => {
 
       console.log(`${role} login response:`, data);
 
-      localStorage.setItem(tokenMap[role], data.token);
+      // ✅ Clear old session
+      localStorage.removeItem("token");
+      localStorage.removeItem("userRole");
+
+      // ✅ Store token + role
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userRole", role);
+
       console.log(`${role} token stored:`, data.token);
+      console.log(`Role stored:`, role);
 
       navigate(redirectMap[role]);
     } catch (error) {

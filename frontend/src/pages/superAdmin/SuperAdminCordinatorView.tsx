@@ -32,6 +32,8 @@ const [totalPages, setTotalPages] = useState(1);
   totalPages={totalPages}
   onPageChange={setPage}
   onSearchChange={setSearch}
+  role="superadmin"
+  showCoordinatorExtra={true}
   showCoordinatorType
   toggleBlock={async (id, role) => {
     if (role === "superadmin") {

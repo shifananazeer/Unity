@@ -58,7 +58,10 @@ const UserViewCoordinator = () => {
       onPageChange={setPage}
       onSearchChange={setSearch}
      showCoordinator={false}
+     showDetails={true}
+      role="coordinator"
       showChat={true}
+      
       toggleBlock={async (id) => {
         await coordinatorToggleUserBlock(id);
         fetchUsers(); // refresh table after toggle

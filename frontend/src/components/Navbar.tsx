@@ -11,25 +11,21 @@ const Navbar: React.FC<NavbarProps> = ({ role, adminName, toggleSidebar }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    if (role === "superadmin") {
-      localStorage.removeItem("superAdminToken");
-      navigate("/login/superadmin");
-    } else if (role === "admin") {
-      localStorage.removeItem("adminToken");
-      navigate("/login/admin");
-    } else if (role === "coordinator") {
-      localStorage.removeItem("coordinatorToken");
-      localStorage.removeItem("coordinatorId"); 
-      navigate("/login/coordinator");
-    }
+     localStorage.removeItem("token");
+
+  // optional: if you stored role
+  localStorage.removeItem("role");
+
+  navigate(`/login/${role}`);
+
   };
 
   const getTitle = () => {
     switch (role) {
       case "superadmin":
-        return "Super Admin";
+        return "Unity Creater";
       case "admin":
-        return "Admin";
+        return "Incharge";
       case "coordinator":
         return "Coordinator";
       default:
@@ -77,10 +73,10 @@ const Navbar: React.FC<NavbarProps> = ({ role, adminName, toggleSidebar }) => {
             {adminName?.charAt(0).toUpperCase()}
           </div>
 
-          {/* Hide name on mobile */}
+          {/* Hide name on mobile
           <span className="hidden md:block text-gray-700 font-medium">
             {adminName}
-          </span>
+          </span> */}
         </div>
 
         {/* Logout */}

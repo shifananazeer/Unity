@@ -15,7 +15,9 @@ import {
   uploadQRCode,
   getCoordinators,
   getAdmins,
-  getCoordinatorById
+  getCoordinatorById,
+  adminProfile,
+  changeAdminPassword
 } from "../../controllers/superadmin/dashboardController";
 
 import authMiddleware from "../../middleware/authMiddleware";
@@ -62,4 +64,8 @@ router.get("/get-coordinators",authMiddleware(["superadmin"]),getCoordinators);
 router.get("/admins/filter" ,authMiddleware(["superadmin"]), getAdmins )
 
 router.get("/coordinator/:id",authMiddleware(["superadmin"]) , getCoordinatorById);
+
+router.get("/profile" , authMiddleware(["superadmin"]), adminProfile)
+
+router.put( "/change-password",authMiddleware(["superadmin"]),changeAdminPassword);
 export default router;

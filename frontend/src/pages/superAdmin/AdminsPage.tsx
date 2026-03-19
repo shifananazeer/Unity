@@ -49,6 +49,9 @@ const AdminsPage = () => {
   page={page}
   totalPages={totalPages}
   onPageChange={setPage}
+  role="superadmin"
+  showChat={false}
+  showDetails={false}
   onSearchChange={(value) => {
     setPage(1);
     setSearch(value);

@@ -3,23 +3,26 @@ import api from "./api";
 interface SendMessageParams {
   receiverId: string;
   text: string;
+   receiverRole: "user" | "coordinator" | "admin";
 }
 
 export interface Message {
   _id: string;
   sender: string;
   receiver: string;
+  receiverRole:string;
+  senderRole:string;
   text: string;
   createdAt: string;
 }
 
 // Send a message to backend (DB)
-export const sendMessage = async ({ receiverId, text }: SendMessageParams) => {
+export const sendMessage = async ({ receiverId,receiverRole, text }: SendMessageParams) => {
   try {
     const token = localStorage.getItem("token");
     const res = await api.post(
       "/chat/send",
-      { receiverId, text },
+      { receiverId, receiverRole ,text },
       {
         headers: { Authorization: `Bearer ${token}` },
       }

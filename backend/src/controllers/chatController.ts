@@ -3,26 +3,31 @@ import Message from "../models/Message";
 
 export const sendMessage = async (req: any, res: any) => {
   try {
-    const sender = req.user.id; // from auth middleware
-    const { receiverId, text } = req.body;
+    const sender = req.user.id; // logged-in user/coordinator/admin
+    const senderRole = req.user.role; // "user" | "coordinator" | "admin"
+    const { receiverId, receiverRole, text } = req.body;
 
-    if (!receiverId || !text) {
-      return res.status(400).json({ message: "receiverId and text are required" });
+    if (!receiverId || !receiverRole || !text) {
+      return res.status(400).json({ message: "receiverId, receiverRole, and text are required" });
     }
 
     const message = await Message.create({
       sender,
+      senderRole,
       receiver: receiverId,
+      receiverRole,
       text,
     });
 
-    // emit to receiver via socket
-    const io = require("../socket").getIO(); // get initialized socket
+    // Emit message to receiver via socket
+    const io = require("../socket").getIO();
     io.to(receiverId).emit("receiveMessage", {
       _id: message._id.toString(),
       sender,
+      senderRole,
       receiver: receiverId,
-      text,
+      receiverRole,
+      text: message.text,
       createdAt: message.createdAt,
     });
 
@@ -33,7 +38,6 @@ export const sendMessage = async (req: any, res: any) => {
   }
 };
 
-// Fetch all messages between logged-in user and receiver
 export const getMessages = async (req: any, res: any) => {
   try {
     const userId = req.user.id;
@@ -50,7 +54,9 @@ export const getMessages = async (req: any, res: any) => {
       messages.map((m) => ({
         _id: m._id.toString(),
         sender: m.sender.toString(),
+        senderRole: m.senderRole,
         receiver: m.receiver.toString(),
+        receiverRole: m.receiverRole,
         text: m.text,
         createdAt: m.createdAt,
       }))

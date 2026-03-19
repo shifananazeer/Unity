@@ -17,13 +17,20 @@ const AdminUsers = () => {
   const [page, setPage] = useState(1);
 const [search, setSearch] = useState("");
 const [totalPages, setTotalPages] = useState(1);
+const [loading, setLoading] = useState(false);
 
-  const fetchUsers = async () => {
-  const data = await getUsers(page, 5, search);
-  setUsers(data.users);
-  setTotalPages(data.totalPages);
-};
-
+   const fetchUsers = async () => {
+    setLoading(true); // start loading
+    try {
+      const data = await getUsers(page, 5, search);
+      setUsers(data.users);
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      console.error("Error fetching users", err);
+    } finally {
+      setLoading(false); // stop loading
+    }
+  };
   useEffect(() => {
     fetchUsers();
   }, [page, search]);
@@ -38,6 +45,8 @@ const [totalPages, setTotalPages] = useState(1);
   onPageChange={setPage}
   onSearchChange={setSearch}
    showHierarchy={true}
+   role="superadmin"
+   showDetails={true}
   toggleBlock={async (id, role) => {
     if (role === "admin") {
       await toggleAdminBlock(id);

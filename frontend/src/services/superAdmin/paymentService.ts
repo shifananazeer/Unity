@@ -3,7 +3,7 @@ import api from "../api";
 
 export const getPayments = async () => {
   try {
-    const token = localStorage.getItem("superAdminToken")
+    const token = localStorage.getItem("token")
     const res = await api.get("/superadmin/payments",
       {headers:{
         Authorization:`Bearer ${token}`

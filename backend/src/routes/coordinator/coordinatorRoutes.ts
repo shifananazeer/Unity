@@ -11,7 +11,8 @@ import {
      updateCoordinatorUpi,
      getCoordinatorUpi,
      getMissedPayments,
-     removeUser
+     removeUser,
+     getUserDetails
     } from "../../controllers/coordinator/coordinatorController";
 
 
@@ -39,4 +40,5 @@ router.get("/missed-payments",authMiddleware(["coordinator"]), getMissedPayments
 
 router.delete("/remove-user/:userId",authMiddleware(["coordinator"]) , removeUser);
 
+router.get("/userdetails/:userId" , authMiddleware(["coordinator" ,"admin" ,"superadmin"]), getUserDetails)
 export default router;

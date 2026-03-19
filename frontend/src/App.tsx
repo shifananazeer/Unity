@@ -31,6 +31,8 @@ import MissedPaymentsCoordinator from "./pages/coordinator/MissedPaymentsCoordin
 import MissedPaymentsAdmin from "./pages/admin/MissedPaymentsAdmin";
 import DirectSellingPage from "./pages/user/DirectSellingPage";
 import RDCommunityPage from "./pages/user/RDCommunityPage";
+import SuperAdminProfile from "./pages/superAdmin/SuperAdminProfile";
+import AdminProfile from "./pages/admin/AdminProfile";
 function App() {
   return (
     <Routes>
@@ -52,7 +54,7 @@ function App() {
         <Route path="/rd-community" element={<RDCommunityPage />} />
       </Route>
 
-      {/* ADMIN LOGIN */}
+      {/*  LOGIN */}
       <Route path="/login/superadmin" element={<Login role="superadmin" />} />
 <Route path="/login/admin" element={<Login role="admin" />} />
 <Route path="/login/coordinator" element={<Login role="coordinator" />} />
@@ -66,6 +68,7 @@ function App() {
   <Route path="/superadmin/qrcode" element={<QRManagement/>}/>
   <Route path="/superadmin/coordinators" element = {<SuperAdminCoordinatorView/>}/>
   <Route path="/superadmin/payments" element={<SuperAdminPaymentPage/>}/>
+  <Route path="/superadmin/profile" element={<SuperAdminProfile/>}/>
 </Route>
 
 <Route element={<AdminProtectedRoute role="admin"><Layout role="admin" /></AdminProtectedRoute>}>
@@ -75,6 +78,8 @@ function App() {
   <Route path="/admin/payments" element={<PaymentsView />} /> 
   <Route path="/admin/upi" element={<AdminUpiPage />} />
   <Route path="/admin/missedPayments" element={<MissedPaymentsAdmin />} />
+  <Route path="/admin/profile" element={<AdminProfile/>} />
+  
 </Route>
 
 {/* COORDINATOR ROUTES */}

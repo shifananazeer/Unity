@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ISuperAdmin extends Document {
-  name?: string;
+  fullName?: string;
   email: string;
   password: string;
   isActive: boolean;
@@ -9,7 +9,7 @@ export interface ISuperAdmin extends Document {
 
 const SuperAdminSchema: Schema = new Schema(
   {
-    name: {
+    fullName: {
       type: String,
       trim: true,
     },

@@ -8,6 +8,8 @@ import Coordinator from "../../models/coordinator";
 import Payment ,{IPayment} from "../../models/Payment";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import CommunityJoin from "../../models/CommunityJoin";
+import RDCommunity from "../../models/RDCommunity";
 
 export const adminLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -35,12 +37,12 @@ export const adminLogin = async (req: Request, res: Response) => {
 export const getAdminDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const adminId = req.user?.id;
+    const authHeader = req.headers.authorization;
+console.log("Auth Header:", authHeader);
 
     if (!adminId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    console.log("adminId:", adminId);
 
     // 1️⃣ Total users under this admin
     const totalUsers = await User.countDocuments({ admin: adminId });
@@ -48,14 +50,27 @@ export const getAdminDashboardStats = async (req: AuthRequest, res: Response) =>
     // 2️⃣ Total coordinators under this admin
     const totalCoordinators = await Coordinator.countDocuments({ admin: adminId });
 
-    // 3️⃣ Payments stats
-    // Get all user IDs under this admin
+    // 3️⃣ Get all user IDs under this admin
     const users = await User.find({ admin: adminId }).select("_id");
     const userIds = users.map((u) => u._id);
 
-    // Count payments by status
+    // 4️⃣ Community counts (filtered by admin users)
+    const totalDirectSellingUsers = await CommunityJoin.countDocuments({
+      userId: { $in: userIds },
+    });
+
+    const totalRDUsers = await RDCommunity.countDocuments({
+      user: { $in: userIds },
+    });
+
+    // 5️⃣ Payments aggregation (ONLY paid & pending)
     const payments = await Payment.aggregate([
-      { $match: { userId: { $in: userIds } } },
+      {
+        $match: {
+          userId: { $in: userIds },
+          status: { $in: ["paid", "pending"] },
+        },
+      },
       {
         $group: {
           _id: "$status",
@@ -64,27 +79,27 @@ export const getAdminDashboardStats = async (req: AuthRequest, res: Response) =>
       },
     ]);
 
-    // Initialize counts
-    let totalPayments = 0;
-    let paidCount = 0;
-    let submittedCount = 0;
-    let failedCount = 0;
+    let totalPayments = 0;   // ✅ only paid
+    let failedPayments = 0;  // ✅ pending
 
     payments.forEach((p) => {
-      totalPayments += p.count;
-      if (p._id === "paid") paidCount = p.count;
-      else if (p._id === "submitted") submittedCount = p.count;
-      else failedCount += p.count; // all other statuses
+      if (p._id === "paid") {
+        totalPayments = p.count;
+      } else if (p._id === "pending") {
+        failedPayments = p.count;
+      }
     });
-
+ console.log("redCount .........................." ,totalRDUsers)
+    // ✅ Final response
     res.json({
       totalUsers,
       totalCoordinators,
       totalPayments,
-      paidPayments: paidCount,
-      submittedPayments: submittedCount,
-      failedPayments: failedCount,
+      failedPayments,
+      totalDirectSellingUsers,
+      totalRDUsers,
     });
+
   } catch (error) {
     console.error("Admin dashboard stats error:", error);
     res.status(500).json({ message: "Server error" });
@@ -546,6 +561,65 @@ export const removeUser = async (req: Request, res: Response) => {
     res.status(200).json({ message: "User removed successfully" });
   } catch (error) {
     console.error("Error removing user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const adminProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const adminId = req.user?.id;
+
+    if (!adminId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const profile = await SecondAdmin.findById(adminId).select("-password");
+
+    if (!profile) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.status(200).json(profile);
+
+  } catch (error) {
+    console.error("Admin profile error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const changeAdminPassword = async (req: AuthRequest, res: Response) => {
+  try {
+    const adminId = req.user?.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!adminId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const admin = await SecondAdmin.findById(adminId);
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // check current password
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password incorrect" });
+    }
+
+    // hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    admin.password = hashedPassword;
+
+    await admin.save();
+
+    res.json({ message: "Password updated successfully" });
+
+  } catch (error) {
+    console.error("Change password error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

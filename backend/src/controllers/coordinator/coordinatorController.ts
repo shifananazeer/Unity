@@ -10,6 +10,8 @@ import DirectSellingCommunityJoin from "../../models/CommunityJoin"
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import Message from "../../models/Message";
+import RDCommunity from "../../models/RDCommunity";
+
 
 
 
@@ -39,9 +41,9 @@ export const coordinatorLogin = async (req: Request, res: Response) => {
 
 
 export const getCoordinatorDashboardStats = async (req: AuthRequest, res: Response) => {
-   try {
+  try {
     const coordinatorId = req.user?.id;
-    
+
     if (!coordinatorId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -51,42 +53,55 @@ export const getCoordinatorDashboardStats = async (req: AuthRequest, res: Respon
     const userIds = users.map((u) => u._id);
     const totalUsers = users.length;
 
-    // 2️⃣ Payments stats
-    const payments = await Payment.aggregate([
-      { $match: { userId: { $in: userIds } } },
-      {
-        $group: {
-          _id: "$status",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
+    // 2️⃣ Payment stats (ONLY paid & pending)
+   const paymentStats = await Payment.aggregate([
+  {
+    $match: {
+      userId: { $in: userIds },
+      status: { $in: ["paid", "pending", "submitted"] }, // include submitted
+    },
+  },
+  {
+    $group: {
+      _id: "$status",
+      count: { $sum: 1 },
+    },
+  },
+]);
 
-    let totalPayments = 0;
-    let paidCount = 0;
-    let submittedCount = 0;
-    let failedCount = 0;
+let paidPayments = 0;
+let submittedPayments = 0;
+let failedPayments = 0;
 
-    payments.forEach((p) => {
-      totalPayments += p.count;
-      if (p._id === "paid") paidCount = p.count;
-      else if (p._id === "submitted") submittedCount = p.count;
-      else failedCount += p.count;
-    });
+paymentStats.forEach((p) => {
+  if (p._id === "paid") {
+    paidPayments = p.count;
+  } else if (p._id === "submitted") {
+    submittedPayments = p.count;
+  } else if (p._id === "pending") {
+    failedPayments = p.count;
+  }
+});
 
-    // 3️⃣ Count joined members in direct selling community
-    // DirectSellingCommunityJoin collection has a field `userId`
-    const joinedMembersCount = await DirectSellingCommunityJoin.countDocuments({
+// totalPayments = paid + submitted
+const totalPayments = paidPayments + submittedPayments;
+    // 3️⃣ Direct Selling Community count
+    const directSellingCount = await DirectSellingCommunityJoin.countDocuments({
       userId: { $in: userIds },
     });
 
+    // 4️⃣ RD Community count
+    const rdCommunityCount = await RDCommunity.countDocuments({
+      user: { $in: userIds },
+    });
+console.log("DSC" , directSellingCount)
+    // ✅ Final response
     res.json({
       totalUsers,
       totalPayments,
-      paidPayments: paidCount,
-      submittedPayments: submittedCount,
-      failedPayments: failedCount,
-      joinedMembers: joinedMembersCount,
+      failedPayments,
+      totalDirectSellingUsers: directSellingCount,
+      totalRDUsers: rdCommunityCount,
     });
 
   } catch (error) {
@@ -94,7 +109,6 @@ export const getCoordinatorDashboardStats = async (req: AuthRequest, res: Respon
     res.status(500).json({ message: "Server error" });
   }
 };
-
 export const getAssignedUsers = async (req: AuthRequest, res: Response) => {
   try {
     const coordinatorId = req.user?.id;
@@ -424,5 +438,21 @@ export const sendCoordinatorMessage = async (req:AuthRequest, res:Response) => {
     res.json(message);
   } catch (err) {
     res.status(500).json({ message: "Error sending message", error: err });
+  }
+};
+
+
+export const getUserDetails = async (req: any, res: any) => {
+  try {
+   const { userId } = req.params;
+    console.log("📥 Received ID:", userId);
+    const user = await User.findById(userId)
+      .populate("referredUsers", "fullName mobileNumber")
+      .populate("coordinator", "fullName")
+      .populate("admin", "fullName");
+    console.groupCollapsed("userDetals " , user)
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user details" });
   }
 };

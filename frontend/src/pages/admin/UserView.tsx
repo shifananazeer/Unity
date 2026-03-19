@@ -38,6 +38,8 @@ const [totalPages, setTotalPages] = useState(1);
   totalPages={totalPages}
   onPageChange={setPage}
   showChat={true}
+   role="admin"
+   showDetails={true}
   onSearchChange={setSearch}
   showCoordinator={true}
   toggleBlock={async (id) => {

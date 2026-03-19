@@ -12,7 +12,7 @@ console.log("coordinator login response:", res.data);
 };
 
 export const getCoordinatorDashboardStats = async () => {
-     const token  = localStorage.getItem("coordinatorToken")
+     const token  = localStorage.getItem("token")
      console.log("coordinator token " , token)
       try {
         const res = await api.get("/coordinator/dashboard-stats" ,{
@@ -29,7 +29,7 @@ export const getCoordinatorDashboardStats = async () => {
 }
 
 export const getUser = async(page = 1 , limit = 5 , search = "") => {
-const token = localStorage.getItem("coordinatorToken")
+const token = localStorage.getItem("token")
 try{
     const res = await api.get("/coordinator/users", {
         params: { page, limit, search },
@@ -47,7 +47,7 @@ try{
 
 export const coordinatorToggleUserBlock = async (userId: string) => {
   try {
-    const token = localStorage.getItem("coordinatorToken");
+    const token = localStorage.getItem("token");
 
     const res = await api.patch(
       `/coordinator/toggle-user-block/${userId}`,
@@ -68,7 +68,7 @@ export const coordinatorToggleUserBlock = async (userId: string) => {
 
 export const getPayments = async () => {
   try{
-    const token = localStorage.getItem("coordinatorToken")
+    const token = localStorage.getItem("token")
     const res = await api.get("/coordinator/payments",
       {
         headers:{
@@ -86,7 +86,7 @@ export const getPayments = async () => {
 
 export const getCoordinatorProfile = async () => {
   try{
-    const token = localStorage.getItem("coordinatorToken")
+    const token = localStorage.getItem("token")
     const res = await api.get("/coordinator/profile",
       {
         headers:{
@@ -107,7 +107,7 @@ export const changeCoordinatorPassword = async (data: {
   newPassword: string;
 }) => {
   try {
-    const token = localStorage.getItem("coordinatorToken");
+    const token = localStorage.getItem("token");
 
     const response = await api.put(
       "/coordinator/change-password",
@@ -127,7 +127,7 @@ export const changeCoordinatorPassword = async (data: {
 };
 
 export const getCoordinatorUpi = async () => {
-    const token = localStorage.getItem("coordinatorToken");
+    const token = localStorage.getItem("token");
   const res = await api.get("/coordinator/coordinator-upi" ,
      {
         headers:{
@@ -139,7 +139,7 @@ export const getCoordinatorUpi = async () => {
 };
 
 export const updateCoordinatorUpi = async (upiId: string) => {
-    const token = localStorage.getItem("coordinatorToken");
+    const token = localStorage.getItem("token");
   const res = await api.put("/coordinator/coordinator-upi", { upiId } ,
      {
         headers: {
@@ -153,7 +153,7 @@ export const updateCoordinatorUpi = async (upiId: string) => {
 export const getMissedPayments = async () => {
   try {
     console.log("service")
-    const token = localStorage.getItem("coordinatorToken");
+    const token = localStorage.getItem("token");
     const res = await api.get("/coordinator/missed-payments", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -169,7 +169,7 @@ export const getMissedPayments = async () => {
 
 export const removeUser = async (userId: string) => {
   try {
-    const token = localStorage.getItem("coordinatorToken");
+    const token = localStorage.getItem("token");
 
     const res = await api.delete(`/coordinator/remove-user/${userId}`, {
       headers: {
@@ -184,4 +184,18 @@ export const removeUser = async (userId: string) => {
   }
 };
 
-
+export const getUserDetails = async (userId: string) => {
+  console.log("use Id" , userId)
+  try{
+    const token = localStorage.getItem("token");
+  const res = await api.get(`/coordinator/userdetails/${userId}`,{
+    headers: {
+        Authorization: `Bearer ${token}`,
+      },
+  });
+  return res.data;
+}catch (error) {
+  console.error("Failed to fetch details:", error);
+    throw error;
+}
+};

@@ -13,8 +13,8 @@ import api from "../api";
         return res.data;
   }; 
 
-export const signupUser = async (fullName: string, mobileNumber: string, pinCode: string, district: string, state: string, localBody: string, password: string, type:string) => {
-    const res = await api.post("/auth/signup", { fullName, mobileNumber, pinCode, district, state, localBody, password, type });
+export const signupUser = async (fullName: string, mobileNumber: string, pinCode: string, district: string, state: string, localBody: string, password: string, type:string ,referralCode:string) => {
+    const res = await api.post("/auth/signup", { fullName, mobileNumber, pinCode, district, state, localBody, password, type , referralCode });
     const userId = res.data.user._id;
     
     // Save to localStorage
@@ -52,3 +52,5 @@ export const getRDStatus = async () => {
 
   return res.data;
 };
+
+

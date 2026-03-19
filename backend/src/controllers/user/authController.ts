@@ -4,16 +4,29 @@ import bcrypt from "bcryptjs";
 import generateToken from "../../utils/generateToken";
 import Coordinator from "../../models/coordinator";
 import SecondAdmin from "../../models/admin"
-
+import { getNextUserCode } from "../../utils/generateUserCode";
+import { generateReferralCode } from "../../utils/generateReferralCode";
 
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { fullName, mobileNumber, pinCode, district, state, localBody, password , type } = req.body;
-     if (!fullName || !mobileNumber || !password) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-     const existingUser = await User.findOne({ mobileNumber });
+    const {
+      fullName,
+      mobileNumber,
+      pinCode,
+      district,
+      state,
+      localBody,
+      password,
+      type,
+      referralCode,
+    } = req.body;
+
+    if (!fullName || !mobileNumber || !password) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const existingUser = await User.findOne({ mobileNumber });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -22,13 +35,12 @@ export const signup = async (req: Request, res: Response) => {
 
     let coordinatorId = null;
 
-    // ✅ Assign based on type
+    // ✅ Assign coordinator
     if (type === "nano") {
       const nanoCoordinator = await Coordinator.findOne({
         type: "nano",
         pin: pinCode,
       });
-
       coordinatorId = nanoCoordinator?._id;
     }
 
@@ -37,12 +49,17 @@ export const signup = async (req: Request, res: Response) => {
         type: "micro",
         area: localBody,
       });
-
       coordinatorId = microCoordinator?._id;
     }
 
     // ✅ Find admin
     const admin = await SecondAdmin.findOne({ district });
+
+    // ✅ Generate referral code (UNIQUE)
+    const newReferralCode = await generateReferralCode();
+
+    // ✅ Generate user code
+    const userCode = await getNextUserCode();
 
     const newUser = new User({
       fullName,
@@ -52,12 +69,29 @@ export const signup = async (req: Request, res: Response) => {
       state,
       localBody,
       password: hashedPassword,
-      type, // 👈 store type
-      coordinator: coordinatorId, // 👈 single field (better design)
+      type,
+      coordinator: coordinatorId,
       admin: admin?._id,
+      userCode,
+      referralCode: newReferralCode,
     });
 
     await newUser.save();
+
+    // ✅ HANDLE REFERRAL (BEFORE RESPONSE)
+    if (referralCode) {
+      const referrer = await User.findOne({ referralCode });
+
+      if (!referrer) {
+        return res.status(400).json({ message: "Invalid referral code" });
+      }
+
+      // ✅ Prevent self-referral (extra safety)
+      if (referrer._id.toString() !== newUser._id.toString()) {
+        referrer.referredUsers.push(newUser._id);
+        await referrer.save();
+      }
+    }
 
     const token = generateToken(newUser._id.toString(), "user");
 
@@ -72,6 +106,7 @@ export const signup = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 export const login = async (req: Request, res: Response) => {
     try{

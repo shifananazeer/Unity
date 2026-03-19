@@ -57,6 +57,8 @@ const CoordinatorView = () => {
         totalPages={totalPages}
         onPageChange={setPage}
           showCoordinatorType
+          role="admin"
+          showCoordinatorExtra={true}
         onSearchChange={(value) => {
           setPage(1);
           setSearch(value);

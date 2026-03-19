@@ -12,7 +12,8 @@ console.log("Admin login response:", res.data);
 };
 
 export const getDashboardStats = async () => {
-  const token = localStorage.getItem("superAdminToken");
+  const token = localStorage.getItem("token");
+  console.log("TOKEN:", token);
   try { 
     const res = await api.get("/superadmin/dashboard/stats", {
       headers: {
@@ -27,7 +28,7 @@ export const getDashboardStats = async () => {
 };
 
 export const getUsers = async (page = 1, limit = 5, search = "") => {
-  const token = localStorage.getItem("superAdminToken")
+  const token = localStorage.getItem("token")
   try {
     const res = await api.get("/superadmin/users", {
       params: { page, limit, search },
@@ -44,7 +45,7 @@ export const getUsers = async (page = 1, limit = 5, search = "") => {
 };
 export const getAdmins = async (page = 1, limit = 5, search = "") => {
   try {
-    const token = localStorage.getItem("superAdminToken")
+    const token = localStorage.getItem("token")
     const res = await api.get("/superadmin/admins", {
       params: { page, limit, search },
       headers:{
@@ -61,7 +62,7 @@ export const getAdmins = async (page = 1, limit = 5, search = "") => {
 
 export const createAdmin = async (adminData: { fullName: string; phone: string;email:string, district: string; password: string }) => {
   try {
-    const token = localStorage.getItem("superAdminToken")
+    const token = localStorage.getItem("token")
     const res = await api.post("/superadmin/create-admin", adminData,
       {
         headers:{
@@ -80,7 +81,7 @@ export const createAdmin = async (adminData: { fullName: string; phone: string;e
 
 export const toggleUserBlock = async(id: string) =>{
   try{
-    const token = localStorage.getItem("superAdminToken");
+    const token = localStorage.getItem("token");
     const res = await api.patch(`/superadmin/users/block/${id}`,
       {},
      {
@@ -97,7 +98,7 @@ export const toggleUserBlock = async(id: string) =>{
 
 export const toggleAdminBlock = async (id: string) =>{
   try{
-    const token = localStorage.getItem("superAdminToken")
+    const token = localStorage.getItem("token")
  const res = await api.patch(`/superadmin/admins/block/${id}`,
   {},
     {
@@ -115,7 +116,7 @@ export const toggleAdminBlock = async (id: string) =>{
 
 export const updateAdmin = async (id: string, data: any) => {
   try {
-    const token = localStorage.getItem("superAdminToken");
+    const token = localStorage.getItem("token");
 
     const res = await api.put(
       `/superadmin/update-admin/${id}`,
@@ -136,7 +137,7 @@ export const updateAdmin = async (id: string, data: any) => {
 
 
 export const uploadQRCode = async (file: File, amount: number) => {
-  const token = localStorage.getItem("superAdminToken");
+  const token = localStorage.getItem("token");
 
   const formData = new FormData();
   formData.append("qr", file);
@@ -157,7 +158,7 @@ export const uploadQRCode = async (file: File, amount: number) => {
 };
 
 export const getLatestQRCode = async () => {
-   const token = localStorage.getItem("superAdminToken");
+   const token = localStorage.getItem("token");
   const res = await api.get("/superadmin/qr/latest" ,{
     headers:{
       Authorization:`Bearer ${token}`
@@ -167,7 +168,7 @@ export const getLatestQRCode = async () => {
 };
 
 export const getCoordinators = async (page = 1, limit = 5, search = "") => {
-  const token = localStorage.getItem("superAdminToken");
+  const token = localStorage.getItem("token");
 console.log("TOKEN:", token);
   const res = await api.get("/superadmin/get-coordinators", {
     params: { page, limit, search },
@@ -181,7 +182,7 @@ console.log("TOKEN:", token);
 
 export const getAllAdmins = async () => {
   try {
-    const token = localStorage.getItem("superAdminToken");
+    const token = localStorage.getItem("token");
     const res = await api.get("/superadmin/admins/filter", {
       headers: {
         Authorization: `Bearer ${token}`
@@ -201,7 +202,7 @@ export const getAllAdmins = async () => {
 
 export const getCoordinatorById = async (id: string) => {
   try {
-    const token = localStorage.getItem("superAdminToken");
+    const token = localStorage.getItem("token");
     const res = await api.get(`/superadmin/coordinator/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });

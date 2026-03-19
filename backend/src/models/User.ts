@@ -11,8 +11,10 @@ export interface IUser extends Document {
   password: string;
   role?: string; // "user" or "admin"
   coordinator:String;
-  
+  userCode:string;
   admin:string;
+  referralCode:string;
+   referredUsers: mongoose.Types.ObjectId[];
   isBlocked?: boolean;
   profilePic?: string;
 }
@@ -35,7 +37,21 @@ coordinator: {
   type: mongoose.Schema.Types.ObjectId,
   ref: "Coordinator",
 },
+userCode: {
+  type: String,
+  unique: true,
+},
+  referralCode: {
+    type: String,
+    unique: true,
+  },
 
+  referredUsers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 admin:{
    type: mongoose.Schema.Types.ObjectId,
   ref: "SecondAdmin",

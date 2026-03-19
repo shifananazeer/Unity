@@ -6,27 +6,34 @@ import bcrypt from "bcryptjs";
 import { QRCode } from "../../models/qrCode";
 import Coordinator from "../../models/coordinator";
 import coordinator from "../../models/coordinator";
+import CommunityJoin from "../../models/CommunityJoin";
+import RDCommunity from "../../models/RDCommunity";
+import { AuthRequest } from "../../middleware/authMiddleware";
+import superadmin from "../../models/superadmin";
 export const getDashboardStats = async (req: Request, res: Response) => {
   try {
 
-    // Count users based on role from User collection
+   // User counts
     const totalUsers = await User.countDocuments({ role: "user" });
-
     const totalAdmins = await SecondAdmin.countDocuments({ role: "admin" });
-
     const totalCoordinators = await Coordinator.countDocuments({ role: "coordinator" });
+
+    // Community counts
+    const totalDirectSellingUsers = await CommunityJoin.countDocuments();
+    const totalRDUsers = await RDCommunity.countDocuments();
 
     // Payment stats
     const totalPayments = await Payment.countDocuments();
-
-    const failedPayments = await Payment.countDocuments({ status: "failed" });
-
+    const failedPayments = await Payment.countDocuments({ status:"pending" });
+    console.log("stats" , totalAdmins , totalCoordinators , totalDirectSellingUsers , totalRDUsers, totalPayments)
     res.status(200).json({
       totalUsers,
       totalAdmins,
       totalCoordinators,
       totalPayments,
       failedPayments,
+      totalDirectSellingUsers,
+      totalRDUsers,
     });
 
   } catch (error) {
@@ -346,5 +353,64 @@ export const getCoordinatorById = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching coordinator:", error);
     res.status(500).json({ message: "Failed to fetch coordinator" });
+  }
+};
+
+export const adminProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const adminId = req.user?.id;
+
+    if (!adminId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const profile = await superadmin.findById(adminId).select("-password");
+
+    if (!profile) {
+      return res.status(404).json({ message: "Coordinator not found" });
+    }
+
+    res.status(200).json(profile);
+
+  } catch (error) {
+    console.error("Coordinator profile error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const changeAdminPassword = async (req: AuthRequest, res: Response) => {
+  try {
+    const adminId = req.user?.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!adminId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const admin = await superadmin.findById(adminId);
+
+    if (!admin) {
+      return res.status(404).json({ message: "Coordinator not found" });
+    }
+
+    // check current password
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password incorrect" });
+    }
+
+    // hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    admin.password = hashedPassword;
+
+    await admin.save();
+
+    res.json({ message: "Password updated successfully" });
+
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

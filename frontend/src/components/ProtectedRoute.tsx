@@ -4,7 +4,6 @@ import { jwtDecode } from "jwt-decode";
 interface Props {
   children: React.ReactNode;
   allowedRoles?: string[];
-  
 }
 
 interface JwtPayload {
@@ -23,12 +22,21 @@ const ProtectedRoute: React.FC<Props> = ({ children, allowedRoles }) => {
   try {
     const decoded = jwtDecode<JwtPayload>(token);
 
+    // ✅ Expiry check
+    const currentTime = Date.now() / 1000;
+    if (decoded.exp && decoded.exp < currentTime) {
+      localStorage.removeItem("token");
+      return <Navigate to="/" replace />;
+    }
+
+    // ✅ Role check
     if (allowedRoles && !allowedRoles.includes(decoded.role)) {
       return <Navigate to="/" replace />;
     }
 
     return <>{children}</>;
   } catch (error) {
+    localStorage.removeItem("token");
     return <Navigate to="/" replace />;
   }
 };

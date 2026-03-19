@@ -20,7 +20,6 @@ const authMiddleware = (
 ) => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-
       const authHeader = req.headers.authorization;
 
       if (!authHeader) {
@@ -34,53 +33,49 @@ const authMiddleware = (
         process.env.JWT_SECRET as string
       ) as JwtPayload;
 
-      // attach user info
       req.user = decoded;
 
-      console.log("Decoded user id:", decoded.id);
+      console.log("Decoded:", decoded);
 
-      let valid = false;
-
-      if (roles.includes("superadmin")) {
-        const superAdmin = await SuperAdmin.findById(decoded.id);
-        if (superAdmin) {
-          req.role = "superadmin";
-          valid = true;
-        }
-      }
-
-      if (roles.includes("admin")) {
-        const admin = await SecondAdmin.findById(decoded.id);
-        if (admin) {
-          req.role = "admin";
-          valid = true;
-        }
-      }
-
-      if (roles.includes("user")) {
-        const user = await User.findById(decoded.id);
-        if (user) {
-          req.role = "user";
-          valid = true;
-        }
-      }
-
-      if (roles.includes("coordinator")) {
-        const coordinator = await Coordinator.findById(decoded.id);
-        if (coordinator) {
-          req.role = "coordinator";
-          valid = true;
-        }
-      }
-
-      if (!valid) {
+      // ✅ 1. Check role from token FIRST
+      if (!decoded.role || !roles.includes(decoded.role)) {
         return res.status(403).json({ message: "Access denied" });
       }
 
+      let userExists = false;
+
+      // ✅ 2. Verify user exists in correct collection
+      if (decoded.role === "superadmin") {
+        userExists = !!(await SuperAdmin.findById(decoded.id));
+      }
+
+      if (decoded.role === "admin") {
+        userExists = !!(await SecondAdmin.findById(decoded.id));
+      }
+
+      if (decoded.role === "user") {
+        userExists = !!(await User.findById(decoded.id));
+      }
+
+      if (decoded.role === "coordinator") {
+        userExists = !!(await Coordinator.findById(decoded.id));
+      }
+
+      if (!userExists) {
+        return res.status(403).json({ message: "User not found" });
+      }
+      console.log("Decoded:", decoded);
+      req.role = decoded.role;
+
       next();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Auth error:", error);
+
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token expired" });
+      }
+
       return res.status(401).json({ message: "Invalid token" });
     }
   };

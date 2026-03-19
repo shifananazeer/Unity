@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AdminCoordinatorChatModal from "./AdminCoordinatorChatModal";
+import UserDetailsModal from "./UserDetailsModal";
 
 export interface User {
   _id: string;
@@ -16,6 +18,8 @@ export interface User {
     fullName: string;
   };
   type?: "nano" | "micro"; // optional, mainly for super admin
+  area?: string;
+  pin?: string;
 }
 
 interface UsersTableProps {
@@ -28,12 +32,16 @@ interface UsersTableProps {
   onSearchChange: (value: string) => void;
   toggleBlock?: (id: string, role: string) => Promise<void>;
   showEdit?: boolean;
+  showDetails?: boolean;
+  role: "coordinator" | "admin" | "superadmin";
+  chatRole?: "coordinator" | "admin";
   onEdit?: (user: User) => void;
   showChat?: boolean;
   coordinatorType?: "nano" | "micro";
   showCoordinatorType?: boolean;
   showHierarchy?: boolean;
   showCoordinator?: boolean;
+  showCoordinatorExtra?: boolean; // new prop
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({
@@ -45,28 +53,41 @@ const UsersTable: React.FC<UsersTableProps> = ({
   onPageChange,
   onSearchChange,
   toggleBlock,
+  role,
   showEdit = false,
   onEdit,
   showChat = false,
+  showDetails = false,
   coordinatorType,
   showCoordinatorType = false,
   showHierarchy = false,
   showCoordinator = false,
+  showCoordinatorExtra = false, // default false
 }) => {
   const navigate = useNavigate();
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [detailsUser, setDetailsUser] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const loggedInUserId =
+    localStorage.getItem(role === "coordinator" ? "coordinatorId" : "adminId") ||
+    "";
 
   const handleToggleBlock = async (id: string, role: string) => {
-    try {
-      if (!toggleBlock) return;
-      await toggleBlock(id, role);
-      refreshUsers();
-    } catch (error) {
-      console.error("Toggle block error", error);
-    }
+    if (!toggleBlock) return;
+    await toggleBlock(id, role);
+    refreshUsers();
   };
 
-  const handleChat = (userId: string) => {
-    navigate(`/chat/${userId}`);
+  const handleChat = (user: User) => {
+    setSelectedUser(user);
+    setChatOpen(true);
+  };
+
+  const handleViewDetails = (user: User) => {
+    setDetailsUser(user._id);
+    setDetailsOpen(true);
   };
 
   return (
@@ -96,23 +117,20 @@ const UsersTable: React.FC<UsersTableProps> = ({
               <th className="px-6 py-4">Phone</th>
 
               {showCoordinatorType && <th className="px-6 py-4">Type</th>}
-
               {coordinatorType && (
                 <th className="px-6 py-4">
                   {coordinatorType === "nano" ? "Micro Coordinator" : "Nano Coordinator"}
                 </th>
               )}
-
               {showHierarchy && (
                 <>
                   <th className="px-6 py-4">Coordinator</th>
                   <th className="px-6 py-4">Admin</th>
                 </>
               )}
+              {showCoordinator && <th className="px-6 py-4">Coordinator</th>}
 
-              {showCoordinator && (
-                <th className="px-6 py-4">Coordinator</th>
-              )}
+              {showCoordinatorExtra && <th className="px-6 py-4">Area / Pin</th>}
 
               <th className="px-6 py-4">Status</th>
               <th className="px-6 py-4">Actions</th>
@@ -120,7 +138,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
           </thead>
 
           <tbody className="divide-y divide-slate-200">
-            {users?.map((user) => (
+            {users.map((user) => (
               <tr key={user._id} className="hover:bg-slate-50">
                 <td className="px-6 py-4">{user.fullName}</td>
                 <td className="px-6 py-4 capitalize">{user.role}</td>
@@ -130,7 +148,6 @@ const UsersTable: React.FC<UsersTableProps> = ({
                 {showCoordinatorType && (
                   <td className="px-6 py-4 capitalize">{user.type || "-"}</td>
                 )}
-
                 {coordinatorType && (
                   <td className="px-6 py-4">
                     {user.coordinator
@@ -138,7 +155,6 @@ const UsersTable: React.FC<UsersTableProps> = ({
                       : "-"}
                   </td>
                 )}
-
                 {showHierarchy && (
                   <>
                     <td className="px-6 py-4">
@@ -149,12 +165,17 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     <td className="px-6 py-4">{user.admin?.fullName || "-"}</td>
                   </>
                 )}
-
                 {showCoordinator && (
                   <td className="px-6 py-4">
                     {user.coordinator
                       ? `${user.coordinator.fullName} - ${user.coordinator.type || "-"}`
                       : "-"}
+                  </td>
+                )}
+
+                {showCoordinatorExtra && (
+                  <td className="px-6 py-4">
+                    {user.type === "micro" ? user.area || "-" : user.pin || "-"}
                   </td>
                 )}
 
@@ -191,12 +212,21 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     </button>
                   )}
 
-                  {showChat && (
+                  {showChat && role !== "superadmin" && ( // superadmin has no chat
                     <button
-                      onClick={() => handleChat(user._id)}
+                      onClick={() => handleChat(user)}
                       className="px-3 py-1 rounded bg-green-500 text-white"
                     >
                       Chat
+                    </button>
+                  )}
+
+                  {showDetails && (
+                    <button
+                      onClick={() => handleViewDetails(user)}
+                      className="px-3 py-1 rounded bg-purple-500 text-white"
+                    >
+                      Details
                     </button>
                   )}
                 </td>
@@ -208,7 +238,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
 
       {/* MOBILE CARDS */}
       <div className="md:hidden space-y-4">
-        {users?.length > 0 ? (
+        {users.length > 0 ? (
           users.map((user) => (
             <div key={user._id} className="bg-white shadow rounded-lg p-4 border">
               <div className="font-semibold text-lg">{user.fullName}</div>
@@ -226,13 +256,17 @@ const UsersTable: React.FC<UsersTableProps> = ({
               {showHierarchy && (
                 <>
                   <div className="text-sm text-gray-600">
-                    Coordinator: {user.coordinator?.fullName || "-"} 
+                    Coordinator: {user.coordinator?.fullName || "-"}
                     {user.coordinator?.type ? ` - ${user.coordinator.type}` : ""}
                   </div>
-                  <div className="text-sm text-gray-600">
-                    Admin: {user.admin?.fullName || "-"}
-                  </div>
+                  <div className="text-sm text-gray-600">Admin: {user.admin?.fullName || "-"}</div>
                 </>
+              )}
+
+              {showCoordinatorExtra && (
+                <div className="text-sm text-gray-600">
+                  {user.type === "micro" ? `Area: ${user.area || "-"}` : `Pin: ${user.pin || "-"}`}
+                </div>
               )}
 
               <div className="mt-2">
@@ -268,9 +302,9 @@ const UsersTable: React.FC<UsersTableProps> = ({
                   </button>
                 )}
 
-                {showChat && (
+                {showChat && role !== "superadmin" && (
                   <button
-                    onClick={() => handleChat(user._id)}
+                    onClick={() => handleChat(user)}
                     className="px-3 py-1 rounded bg-green-500 text-white text-sm"
                   >
                     Chat
@@ -304,6 +338,26 @@ const UsersTable: React.FC<UsersTableProps> = ({
           Next
         </button>
       </div>
+
+      {selectedUser && (
+        <AdminCoordinatorChatModal
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+          userId={loggedInUserId}
+          userRole={role} // only admin/coordinator
+          receiverId={selectedUser._id}
+          receiverRole="user"
+          receiverName={selectedUser.fullName}
+        />
+      )}
+
+      {detailsUser && (
+        <UserDetailsModal
+          isOpen={detailsOpen}
+          onClose={() => setDetailsOpen(false)}
+          userId={detailsUser}
+        />
+      )}
     </div>
   );
 };

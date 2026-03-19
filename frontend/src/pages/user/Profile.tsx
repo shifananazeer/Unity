@@ -5,6 +5,7 @@ import { getProfile } from "../../services/user/profileService";
 import ProfileCard from "../../components/user/ProfileCard";
 import PaymentHistory from "../../components/user/PaymentHistory";
 import ChatModal from "../../components/ChatModal";
+import Swal from "sweetalert2";
 
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
@@ -34,7 +35,21 @@ const ProfilePage: React.FC = () => {
   const loggedInUserId = localStorage.getItem("userId") || "";
   console.log("Logged-in userId:", loggedInUserId);
   console.log("Coordinator ID:", user?.coordinator?._id);
+   const handleCopy = (code: string) => {
+  if (!code) return;
 
+  navigator.clipboard.writeText(code);
+
+  Swal.fire({
+    icon: "success",
+    title: "Copied!",
+    text: "Referral code copied to clipboard",
+    timer: 1200,
+    showConfirmButton: false,
+    toast: true,
+    position: "top-end",
+  });
+};
   // Early return if profile is not loaded
   if (!user) {
     return (
@@ -52,7 +67,22 @@ const ProfilePage: React.FC = () => {
       <div className="max-w-2xl mx-auto">
         {/* Profile Card */}
         <ProfileCard profile={{ user }} setProfile={setProfile} />
+         {/* Referral Section */}
+<div className="mt-4 bg-white p-4 rounded-lg shadow flex items-center justify-between">
+  <div>
+    <p className="text-sm text-gray-500">Your Referral Code</p>
+    <p className="text-lg font-semibold text-gray-800">
+      {user?.referralCode || "N/A"}
+    </p>
+  </div>
 
+  <button
+    onClick={() => handleCopy(user?.referralCode)}
+    className="bg-teal-600 text-white px-3 py-1 rounded hover:bg-teal-700 text-sm"
+  >
+    Copy
+  </button>
+</div>
         {/* Message Buttons */}
         <div className="mt-4 flex gap-4">
           {user?.coordinator?._id && (
@@ -84,6 +114,7 @@ const ProfilePage: React.FC = () => {
           isOpen={true}
           onClose={() => setChatOpen({ type: null })}
           userId={loggedInUserId}
+          receiverRole="coordinator"
           receiverId={user.coordinator._id}
           receiverName={user.coordinator.fullName || "Coordinator"}
         />
@@ -94,6 +125,7 @@ const ProfilePage: React.FC = () => {
           isOpen={true}
           onClose={() => setChatOpen({ type: null })}
           userId={loggedInUserId}
+          receiverRole="admin"
           receiverId={user.admin._id}
           receiverName={user.admin.fullName || "Admin"}
         />
