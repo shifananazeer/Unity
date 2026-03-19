@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const authMiddleware_1 = __importDefault(require("../middleware/authMiddleware"));
+const chatController_1 = require("../controllers/chatController");
+const coordinatorChatController_1 = require("../controllers/coordinator/coordinatorChatController");
+const adminChatController_1 = require("../controllers/admin/adminChatController");
+const router = express_1.default.Router();
+router.post("/send", (0, authMiddleware_1.default)(["user"]), chatController_1.sendMessage);
+router.get("/:receiverId", (0, authMiddleware_1.default)(["user"]), chatController_1.getMessages);
+router.post("/usertoadmin/send", (0, authMiddleware_1.default)(["user"]), chatController_1.sendMessage);
+router.get("/getUseradmin/:receiverId", (0, authMiddleware_1.default)(["user"]), chatController_1.getMessages);
+router.post("/coordinator/send", (0, authMiddleware_1.default)(["coordinator"]), coordinatorChatController_1.sendMessageCoordinator);
+router.get("/coordinator/:receiverId", (0, authMiddleware_1.default)(["coordinator"]), coordinatorChatController_1.getMessagesCoordinator);
+router.post("/admin/send", (0, authMiddleware_1.default)(["admin"]), adminChatController_1.sendMessageAdmin);
+router.get("/admin/:receiverId", (0, authMiddleware_1.default)(["admin"]), adminChatController_1.getMessagesAdmin);
+exports.default = router;

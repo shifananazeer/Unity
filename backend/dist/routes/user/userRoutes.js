@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const profileController_1 = require("../../controllers/user/profileController");
+const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
+const uploadMiddleware_1 = __importDefault(require("../../middleware/uploadMiddleware"));
+const userController_1 = require("../../controllers/user/userController");
+const router = express_1.default.Router();
+router.get("/profile", (0, authMiddleware_1.default)(["user"]), profileController_1.getProfile);
+router.put("/profile", (0, authMiddleware_1.default)(["user"]), profileController_1.updateProfile);
+router.post("/profile/pic", (0, authMiddleware_1.default)(["user"]), uploadMiddleware_1.default.single("profilePic"), profileController_1.uploadProfilePic);
+router.get("/payments", (0, authMiddleware_1.default)(["user"]), profileController_1.getUserPayments);
+router.post("/community/join", (0, authMiddleware_1.default)(["user"]), userController_1.joinCommunity);
+router.get("/community-status", (0, authMiddleware_1.default)(["user"]), userController_1.getCommunityStatus);
+router.get("/upi-details", (0, authMiddleware_1.default)(["user"]), userController_1.getUpiDetails);
+router.post("/rd/join", (0, authMiddleware_1.default)(["user"]), userController_1.joinRDCommunity);
+router.get("/rd/status", (0, authMiddleware_1.default)(["user"]), userController_1.getRDStatus);
+exports.default = router;

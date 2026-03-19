@@ -1,0 +1,76 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getMessagesCoordinator = exports.sendMessageCoordinator = void 0;
+const Message_1 = __importDefault(require("../../models/Message"));
+const socket_1 = require("../../socket");
+const sendMessageCoordinator = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const sender = req.user.id; // coordinator id
+        const { receiverId, text } = req.body;
+        if (!receiverId || !text)
+            return res.status(400).json({ message: "receiverId and text required" });
+        const message = yield Message_1.default.create({
+            sender,
+            receiver: receiverId,
+            text,
+            senderRole: "coordinator",
+            receiverRole: "user", // coordinator always talks to users
+        });
+        // Emit via socket
+        const io = (0, socket_1.getIO)();
+        io.to(receiverId).emit("receiveMessage", {
+            _id: message._id.toString(),
+            sender,
+            senderRole: "coordinator",
+            receiver: receiverId,
+            receiverRole: "user",
+            text,
+            createdAt: message.createdAt,
+        });
+        res.status(201).json(message);
+    }
+    catch (err) {
+        console.error("Coordinator send message error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+exports.sendMessageCoordinator = sendMessageCoordinator;
+// Get messages between coordinator and a user
+const getMessagesCoordinator = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const coordId = req.user.id;
+        const { receiverId } = req.params;
+        const messages = yield Message_1.default.find({
+            $or: [
+                { sender: coordId, receiver: receiverId },
+                { sender: receiverId, receiver: coordId },
+            ],
+        }).sort({ createdAt: 1 });
+        res.json(messages.map(m => ({
+            _id: m._id.toString(),
+            sender: m.sender.toString(),
+            senderRole: m.senderRole,
+            receiver: m.receiver.toString(),
+            receiverRole: m.receiverRole,
+            text: m.text,
+            createdAt: m.createdAt,
+        })));
+    }
+    catch (err) {
+        console.error("Coordinator get messages error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+exports.getMessagesCoordinator = getMessagesCoordinator;

@@ -1,0 +1,26 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
+const adminController_1 = require("../../controllers/admin/adminController");
+const router = express_1.default.Router();
+router.post("/login", adminController_1.adminLogin);
+router.get("/dashboard-stats", (0, authMiddleware_1.default)(["admin"]), adminController_1.getAdminDashboardStats);
+router.get("/users", (0, authMiddleware_1.default)(["admin"]), adminController_1.getUserBasedOnDistrict);
+router.patch("/toggle-user-block/:id", (0, authMiddleware_1.default)(["admin"]), adminController_1.blockUser);
+router.post("/create-coordinator", (0, authMiddleware_1.default)(["admin"]), adminController_1.createCoordinator);
+router.get("/get-coordinators", (0, authMiddleware_1.default)(["admin"]), adminController_1.getCoordinators);
+router.put("/update-coordinator/:id", (0, authMiddleware_1.default)(["admin"]), adminController_1.updateCoordinator);
+router.patch("/coordinators/block/:id", (0, authMiddleware_1.default)(["admin"]), adminController_1.toggleCoordinatorBlock);
+router.get("/payments", (0, authMiddleware_1.default)(["admin"]), adminController_1.getAdminDistrictPayments);
+router.put("/admin-upi", (0, authMiddleware_1.default)(["admin"]), adminController_1.updateAdminUpi);
+router.get("/admin-upi", (0, authMiddleware_1.default)(["admin"]), adminController_1.getUpi);
+router.get("/coordinators", (0, authMiddleware_1.default)(["admin"]), adminController_1.getCoordinatorsByAdmin);
+router.get("/missed-payments", (0, authMiddleware_1.default)(["admin"]), adminController_1.getAdminMissedPayments);
+router.delete("/remove-user/:userId", (0, authMiddleware_1.default)(["admin"]), adminController_1.removeUser);
+router.get("/profile", (0, authMiddleware_1.default)(["admin"]), adminController_1.adminProfile);
+router.put("/change-password", (0, authMiddleware_1.default)(["admin"]), adminController_1.changeAdminPassword);
+exports.default = router;

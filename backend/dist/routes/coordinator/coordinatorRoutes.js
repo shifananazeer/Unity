@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const authMiddleware_1 = __importDefault(require("../../middleware/authMiddleware"));
+const coordinatorController_1 = require("../../controllers/coordinator/coordinatorController");
+const router = express_1.default.Router();
+router.post("/login", coordinatorController_1.coordinatorLogin);
+router.get("/dashboard-stats", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.getCoordinatorDashboardStats);
+router.get("/users", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.getAssignedUsers);
+router.patch("/toggle-user-block/:id", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.blockUser);
+router.get("/payments", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.getCoordinatorPayments);
+router.get("/profile", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.coordinatorProfile);
+router.put("/change-password", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.changeCoordinatorPassword);
+router.get("/coordinator-upi", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.getCoordinatorUpi);
+router.put("/coordinator-upi", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.updateCoordinatorUpi);
+router.get("/missed-payments", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.getMissedPayments);
+router.delete("/remove-user/:userId", (0, authMiddleware_1.default)(["coordinator"]), coordinatorController_1.removeUser);
+router.get("/userdetails/:userId", (0, authMiddleware_1.default)(["coordinator", "admin", "superadmin"]), coordinatorController_1.getUserDetails);
+exports.default = router;
